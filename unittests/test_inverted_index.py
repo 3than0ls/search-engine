@@ -22,8 +22,13 @@ class TestInvertedIndex(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_add_posting(self):
+        self.assertNotIn('test', self.ii._current_batch.keys())
         self.ii.add_posting('test', Posting('id1', 1))
         self.assertEqual(self.ii._current_batch['test'], [Posting('id1', 1)])
+        self.assertIn('test', self.ii._current_batch.keys())
+
+        self.assertEqual(self.ii.num_terms(), 1)
+        self.assertEqual(self.ii.num_postings(), 1)
 
     def test_add_posting_in_order(self):
         postings = [Posting('id4', 1), Posting('id2', 1),
@@ -31,6 +36,15 @@ class TestInvertedIndex(unittest.TestCase):
         for posting in postings:
             self.ii.add_posting('test', posting)
         self.assertEqual(self.ii._current_batch['test'], sorted(postings))
+        self.assertEqual(self.ii.num_terms(), 1)
+        self.assertEqual(self.ii.num_postings(), 4)
+
+    def test_add_same_posting_twice(self):
+        self.ii.add_posting('test', Posting('id1', 1))
+        self.assertRaises(AssertionError, self.ii.add_posting,
+                          'test', Posting('id1', 1))
+        self.assertEqual(self.ii.num_terms(), 1)
+        self.assertEqual(self.ii.num_postings(), 1)
 
 
 if __name__ == '__main__':
