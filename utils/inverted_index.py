@@ -60,3 +60,6 @@ class InvertedIndex:
         self._num_postings += 1
 
         self._current_batch[term].insert(insert_index, posting)
+
+    def __str__(self):
+        return f"<Inverted Index stored at {self._fp} | {self._num_terms} terms, {self._num_postings} postings>"

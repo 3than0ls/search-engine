@@ -3,9 +3,21 @@ import unittest
 from utils.inverted_index import InvertedIndex
 from utils.posting import Posting
 from indexer import Indexer
+import tempfile
+import os
+import glob
 
 
 class TestInvertedIndex(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.ii_fp = os.path.join(self.temp_dir.name, "test.shelve")
+
+    def tearDown(self):
+        for file in glob.glob(self.ii_fp + '*'):
+            os.remove(file)
+        self.temp_dir.cleanup()
+
     def test_process_document(self):
         indexer = Indexer()
         indexer._process_document('./unittests/doc_id_1.json')
@@ -32,6 +44,25 @@ class TestInvertedIndex(unittest.TestCase):
         self.assertEqual(
             indexer._index._current_batch['baz'],
             [Posting('doc_id_1', 1), Posting('doc_id_2', 1)])
+
+    def test_construct_test_dir(self):
+        indexer = Indexer('./unittests')
+        indexer.construct()
+        self.assertEqual(indexer.num_docs(), 2)
+        self.assertEqual(indexer._index.num_terms(), 3)
+        self.assertEqual(indexer._index.num_postings(), 6)
+
+    def test_construct_test_dir_with_custom_inverted_index(self):
+        return
+        indexer = Indexer(
+            './unittests', _inverted_index_factory=lambda: InvertedIndex(fp=self.ii_fp))
+        indexer.construct()
+        self.assertEqual(indexer.num_docs(), 2)
+        self.assertEqual(indexer._index.num_terms(), 3)
+        self.assertEqual(indexer._index.num_postings(), 6)
+        indexer._index._sync_batch()
+        import time
+        time.sleep(10)
 
 
 if __name__ == '__main__':

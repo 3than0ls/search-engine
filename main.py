@@ -1,7 +1,9 @@
+from indexer import Indexer
 
 
 def main() -> None:
-    pass
+    indexer = Indexer('./ANALYST')
+    indexer.construct()
 
 
 if __name__ == '__main__':

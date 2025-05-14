@@ -1,13 +1,16 @@
 from utils import InvertedIndex, Posting, get_tokens
 from bs4 import BeautifulSoup
 import json
+import glob
 from pathlib import Path
 
 
 class Indexer:
-    def __init__(self, webpages_dir='./ANALYST'):
-        self._index = InvertedIndex()
-        self._webpages_dir = webpages_dir
+    def __init__(self, webpages_dir='./ANALYST', *, _inverted_index_factory=InvertedIndex):
+        self._index = _inverted_index_factory()
+        self._webpages_dir = Path(webpages_dir)
+
+        self._num_docs = 0
 
     def _load_document(self, doc_path: str) -> list[str, str, str]:
         with open(doc_path, 'r', encoding='utf-8') as f:
@@ -35,6 +38,19 @@ class Indexer:
             posting = Posting(doc_id=doc_id, term_frequency=count)
             self._index.add_posting(token, posting)
 
+        self._num_docs += 1
+
+    def num_docs(self) -> int:
+        return self._num_docs
+
     def construct(self) -> None:
         """Construct a full inverted index from a collection of webpages specified in the constructor."""
-        pass
+        for doc_path in self._webpages_dir.rglob('*.json'):
+            self._process_document(doc_path)
+            if self._num_docs > 1000:
+                print('stopping early')
+                break
+        print(self)
+
+    def __str__(self):
+        return f"<Indexer for {self._webpages_dir} | {self._num_docs} documents>"
