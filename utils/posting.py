@@ -5,3 +5,4 @@ from dataclasses import dataclass
 class Posting:
     doc_id: str  # hash
     term_frequency: int
+    # tfidf_score: float

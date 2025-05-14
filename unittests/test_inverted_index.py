@@ -11,11 +11,7 @@ SHELVE_NAME = "test.shelve"
 
 
 class TestInvertedIndex(unittest.TestCase):
-    def test_add_posting(self):
-        ii = InvertedIndex()
-
     def setUp(self):
-        # Create a temporary directory for the shelve files
         self.temp_dir = tempfile.TemporaryDirectory()
         self.ii_fp = os.path.join(self.temp_dir.name, SHELVE_NAME)
         self.ii = InvertedIndex(self.ii_fp)

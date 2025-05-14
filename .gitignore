@@ -1,6 +1,8 @@
 # custom ignores
 .venv
 *.zip
+ANALYST
+DEV
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
