@@ -8,7 +8,7 @@ Each index term is associated with an inverted list
 """
 
 from collections import defaultdict
-from utils.posting import Posting
+from index.posting import Posting
 from utils.merge import merge
 from utils.logger import index_log
 import shelve

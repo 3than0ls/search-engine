@@ -1,8 +1,8 @@
 import unittest
 
-from utils.inverted_index import InvertedIndex
-from utils.posting import Posting
-from indexer import Indexer
+from index.inverted_index import InvertedIndex
+from index.posting import Posting
+from index.indexer import Indexer
 import tempfile
 import os
 import glob

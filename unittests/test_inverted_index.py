@@ -1,11 +1,10 @@
 import unittest
-import shelve
 import tempfile
 import os
 import glob
 
-from utils.inverted_index import InvertedIndex
-from utils.posting import Posting
+from index.inverted_index import InvertedIndex
+from index.posting import Posting
 
 SHELVE_NAME = "test.shelve"
 

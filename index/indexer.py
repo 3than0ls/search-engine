@@ -1,4 +1,6 @@
-from utils import InvertedIndex, Posting, get_tokens, index_log
+from index.inverted_index import InvertedIndex
+from index.posting import Posting
+from utils import get_tokens, index_log
 from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 import json
 from pathlib import Path

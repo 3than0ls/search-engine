@@ -1,4 +1,4 @@
-from indexer import Indexer
+from index import Indexer
 
 
 def main() -> None:
