@@ -1,8 +1,9 @@
 from index import Indexer
+import os
 
 
 def main() -> None:
-    indexer = Indexer('./ANALYST')
+    indexer = Indexer(os.environ.get("WEBPAGES_DIR"))
     indexer.construct()
 
 

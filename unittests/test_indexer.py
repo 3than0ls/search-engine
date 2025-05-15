@@ -19,7 +19,7 @@ class TestInvertedIndex(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_process_document(self):
-        indexer = Indexer()
+        indexer = Indexer('./ANALYST')
         indexer._process_document('./unittests/doc_id_1.json')
         self.assertEqual(
             indexer._index._current_batch['foo'],
@@ -32,7 +32,7 @@ class TestInvertedIndex(unittest.TestCase):
             [Posting('doc_id_1', 1)])
 
     def test_process_two_documents(self):
-        indexer = Indexer()
+        indexer = Indexer('./ANALYST')
         indexer._process_document('./unittests/doc_id_1.json')
         indexer._process_document('./unittests/doc_id_2.json')
         self.assertEqual(

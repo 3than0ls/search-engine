@@ -1,7 +1,9 @@
 #!/bin/sh
 
-# SPECIFY FLAG --no-test TO SKIP UNIT TESTS BEFORE LAUNCH
+export WEBPAGES_DIR="ANALYST/"
+# export WEBPAGES="DEV/"
 
+# SPECIFY FLAG --no-test TO SKIP UNIT TESTS BEFORE LAUNCH
 if [ "$1" = "--no-test" ]; then
     (exit 0)
 else
@@ -14,4 +16,5 @@ else
     .venv/bin/python3 main.py
 fi
 
-du -sh index.shelve ANALYST/
+echo "Index vs base size comparison:"
+du -sh index.shelve "$WEBPAGES_DIR"

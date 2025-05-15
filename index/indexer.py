@@ -11,7 +11,16 @@ warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
 class Indexer:
-    def __init__(self, webpages_dir='./ANALYST', *, _inverted_index_factory=InvertedIndex):
+    """
+    Indexes a directory of webpages downloaded from project specifications.
+    Stores it in InvertedIndex.
+    """
+
+    def __init__(self, webpages_dir, *, _inverted_index_factory=InvertedIndex):
+        if not Path(webpages_dir).is_dir():
+            raise ValueError(
+                f"Webpages directory {webpages_dir} is not a valid directory.")
+
         self._index = _inverted_index_factory()
         self._webpages_dir = Path(webpages_dir)
 
@@ -57,7 +66,6 @@ class Indexer:
 
         for doc_path in self._webpages_dir.rglob('*.json'):
             self._process_document(doc_path)
-
         # sync the index one more time once done processing to save anything in the current batch
         self._index.sync()
 
@@ -71,7 +79,9 @@ class Indexer:
             f"Number of unique tokens: {self._index.num_terms()}\n" + \
             f"Total size of index on disk: {f"{index_size}KB at {self._index._fp}" or "NOT FOUND"}"
         index_log.info(summary)
+        print("-"*50)
         print(summary)
+        print("-"*50)
 
     def __str__(self):
         return f"<Indexer for {self._webpages_dir} | {self._num_docs} documents>"
