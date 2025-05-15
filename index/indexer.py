@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import os
 import warnings
+from collections import Counter
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
@@ -27,6 +28,7 @@ class Indexer:
         self._num_docs = 0
 
     def _load_document(self, doc_path: Path) -> tuple[str, str, str]:
+        """Literally just a loader wrapper, but with some assertion checks that I KNOW will pass."""
         with open(doc_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
@@ -40,22 +42,19 @@ class Indexer:
 
         return content, url, encoding
 
-    def _process_document(self, doc_path: Path) -> None:
+    def _process_document(self, doc_path: Path) -> Counter:
+        """Literally just a tokenizer wrapper, but also increases a _num_docs counter."""
         content, url, _ = self._load_document(doc_path)
-        # could use our own custom hashing of URL, but I'll pass
-        doc_id = doc_path.stem
-
         soup = BeautifulSoup(content, 'html.parser')
         tokens = get_tokens(soup.get_text(separator=" ", strip=True))
 
-        index_log.info(
-            f"Processed [{doc_id}]({url}), and updating the index with {len(tokens)} postings.")
-
-        for token, count in tokens.items():
-            posting = Posting(doc_id=doc_id, term_frequency=count)
-            self._index.add_posting(token, posting)
-
+        # could use our own custom hashing of URL, but I'll pass
+        # doc_id = doc_path.stem
+        # index_log.info(
+        #     f"Processed [{doc_id}]({url}), and updating the index with {len(tokens)} postings.")
         self._num_docs += 1
+
+        return tokens
 
     def num_docs(self) -> int:
         return self._num_docs
@@ -64,20 +63,24 @@ class Indexer:
         """Construct a full inverted index from a collection of webpages specified in the constructor."""
         index_log.info(f"Indexing documents from {self._webpages_dir}")
 
-        for doc_path in self._webpages_dir.rglob('*.json'):
-            self._process_document(doc_path)
-        # sync the index one more time once done processing to save anything in the current batch
-        self._index.sync()
+        with self._index as index:
+            for doc_path in self._webpages_dir.rglob('*.json'):
+                tokens = self._process_document(doc_path)
+                for token, count in tokens.items():
+                    posting = Posting(doc_id=doc_path.stem,
+                                      term_frequency=count)
+                    index.add_posting(token, posting)
 
+        # mundane logging
         index_log.info(
             f"Finished indexing all documents and created object {self}")
-
+        out_dir = self._index._partial_index_dir
         index_size = 0 if not os.path.exists(
-            self._index._fp) else os.path.getsize(self._index._fp) / 1024
+            out_dir) else os.path.getsize(out_dir) / 1024
         summary = f"Index summary:\n" + \
             f"Number of indexed documents: {self._num_docs}\n" + \
             f"Number of unique tokens: {self._index.num_terms()}\n" + \
-            f"Total size of index on disk: {f"{index_size}KB at {self._index._fp}" or "NOT FOUND"}"
+            f"Total size of index(es) on disk: {f"{index_size}KB at {out_dir}" or "NOT FOUND"}"
         index_log.info(summary)
         print("-"*50)
         print(summary)

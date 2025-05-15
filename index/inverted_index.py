@@ -8,28 +8,56 @@ Each index term is associated with an inverted list
 """
 
 from collections import defaultdict
-from index.posting import Posting, POSTING_SIZE
-from utils.merge import merge
+from index.posting import Posting
+from index.posting_list import PostingList
+from index.delimeters import INVERTED_INDEX_KV_DELIMETER, INVERTED_INDEX_DELIMETER
 from utils.logger import index_log
-import shelve
+import os
+from pathlib import Path
 
 
 class InvertedIndex:
     """
-    The inverted index is a mapping of index terms (`str`) to a list of postings (`Posting`)
+    The inverted index is a mapping of index terms (`str`) to postings PostingList (`PostingList`).
+
+    There was an idea (and implementation!) that updated a serialized inverted index in batches, and I believe this to be faster for this project
+    However, specifications require that you dump out partial indexes which are then merged at the end.
+    To be fair, the real world does use this.
     """
 
-    def __init__(self, fp='./index.shelve') -> None:
-        self._fp = fp
+    def __init__(self, partial_index_dir=os.environ.get("PARTIAL_INDEX_DIR")) -> None:
+        if not partial_index_dir:
+            raise ValueError(f"Partial index directory must be set.")
 
-        # batch size is 32MB divided by the size of a Posting
-        # So roughly every 32MBs worth of postings will be synced per batch
-        self._BATCH_SIZE = (2 ** 28) / POSTING_SIZE
-        self._current_batch = defaultdict(list)
-        self._batch_num_postings = 0
+        self._partial_index_dir = Path(partial_index_dir)
 
+        if not os.environ.get("TESTING") == "true" and \
+                self._partial_index_dir.exists() and any(self._partial_index_dir.iterdir()):
+            raise ValueError(
+                f"Partial index directory {self._partial_index_dir} is not empty.")
+
+        # batches are also known as partial indexes, but will keep them called batches
+        # every 10000 postings, dump the current partial index
+        self._BATCH_SIZE = 2 ** 16
+        self._partial_index = defaultdict(PostingList)
+        self._partial_index_id = 0
+
+        # because we reset the partial index every so often, we must keep track of total numbers ourselves
         self._num_postings = 0
         self._num_terms = 0
+
+        self._add_counter = 0
+
+    def _current_partial_index_name(self) -> str:
+        return f"partial_index_{self._partial_index_id}.txt"
+
+    def __enter__(self):
+        self._add_counter = self._num_postings
+        return self
+
+    def __exit__(self, *args):
+        if not os.environ.get("TESTING") == "true" and self._add_counter != self._num_postings:
+            self._dump_partial_index()
 
     def num_terms(self) -> int:
         return self._num_terms
@@ -37,51 +65,37 @@ class InvertedIndex:
     def num_postings(self) -> int:
         return self._num_postings
 
-    def sync(self) -> None:
-        """Syncs the batch to disk and clears the current batch."""
-        index_log.info(
-            f"Syncing batch of {self._batch_num_postings} postings to disk...")
+    def _dump_partial_index(self) -> None:
+        """Dumps the current partial index to disk."""
+        self._partial_index_dir.mkdir(exist_ok=True)
+        fname = f"partial_index_{self._partial_index_id:03}.txt"
+        path = self._partial_index_dir / fname
 
-        with shelve.open(self._fp) as index:
-            for term, postings in self._current_batch.items():
-                shelved_postings = index.get(term, [])
-                # merge postings and current_postings
-                index[term] = merge(shelved_postings, postings)
+        index_log.info(f"Dumping current partial index to {path}")
 
-        self._batch_num_postings = 0
-        self._current_batch.clear()
+        # may want to do wb and .encode('utf-8') for performance benefits (smaller disk size)
+        with open(path, 'w', encoding='utf-8') as f:
+            for term, postings in self._partial_index.items():
+                line = f"{term}{INVERTED_INDEX_KV_DELIMETER}{postings.serialize()}"
+                f.write(line)
+                f.write(INVERTED_INDEX_DELIMETER)
+
+        self._partial_index.clear()
+        self._partial_index_id += 1
 
     def add_posting(self, term: str, posting: Posting) -> None:
         """
-        Add a posting to the inverted index. Postings are ordered by document ID
-
-        `add_posting` iterates through the posting list for the term until it finds the correct location to insert the posting.
-        This could be optimized using a binary tree, but would make merging much more complicated. 
-        This merging issue could be solved by using external libraries.
-
-        Due to the natural alphabetical ordering of the documents when we loop through them, 
-        and the fact that the document names are unique IDs themselves, we start at the end to optimize
-        to a O(1) average case time.
-        This is a operates completely on the assumption that documents are processed by ID in alphabetical ascending order.
+        Add a posting to the inverted index. Postings are ordered by document ID.
         """
-        insert_index = len(self._current_batch[term])
-        # determine the correct location to insert
-        while insert_index > 0 and self._current_batch[term][insert_index - 1].doc_id >= posting.doc_id:
-            assert self._current_batch[term][insert_index - 1].doc_id != posting.doc_id, \
-                f"Found duplicate posting term: {term}: {posting}"
-            insert_index -= 1
-
-        if len(self._current_batch[term]) == 0:
+        if len(self._partial_index[term]) == 0:
             self._num_terms += 1
+
+        self._partial_index[term].add_posting(posting)
+
         self._num_postings += 1
 
-        self._current_batch[term].insert(insert_index, posting)
-
-        self._batch_num_postings += 1
-        # we don't want to do >= self._BATCH_SIZE, because the syncing is asynchronous,
-        # and thus after batch sizes has been exceeded, it'll spam more sync() calls
-        if self._batch_num_postings % self._BATCH_SIZE == 0:
-            self.sync()
+        if self._num_postings % self._BATCH_SIZE == 0:
+            self._dump_partial_index()
 
     def __str__(self):
-        return f"<Inverted Index stored at {self._fp} | {self._num_terms} terms, {self._num_postings} postings>"
+        return f"<Inverted Index stored in parts at {self._partial_index_dir} | {self._num_terms} terms, {self._num_postings} postings>"

@@ -1,49 +1,47 @@
 from dataclasses import dataclass
 import sys
 
+from index.delimeters import POSTING_DELIMETER
+
 
 @dataclass(order=True)
 class Posting:
+    """A singular posting for a posting list in an inverted index. Posting is dumb and doesn't actually know what term it's for."""
     doc_id: str  # hash
     term_frequency: int
-    tfidf_score: float = 1
-    url: str = ""
+    # tfidf_score: float = 1
+    # url: str = ""
 
+    def __str__(self):
+        return f"<Posting with doc ID {self.doc_id}>"
 
-POSTING_SIZE = sys.getsizeof(Posting('', 0))
+    def serialize(self):
+        """Return a serialized representation for disk storage."""
+        return POSTING_DELIMETER.join([self.doc_id, str(self.term_frequency)])
 
 
 if __name__ == '__main__':
-    import functools
-    inst_size = sys.getsizeof(Posting('test', 0)) / 1024
-    NUM_INSTANCES = 10000
-    instances = [Posting(str(i), i) for i in range(NUM_INSTANCES)]
-    instances_size = functools.reduce(
-        lambda acc, obj: acc + sys.getsizeof(obj),
-        instances,
-        0
-    ) / 1024
-    print(
-        f"Instance size: {inst_size}KB\n{NUM_INSTANCES} Instances: {instances_size}KB")
-
-    batch_size = (2 ** 28) / POSTING_SIZE
-    print(f"Batch size: {2 ** 28} / {POSTING_SIZE}")
-    print(f"Batch size: {batch_size}")
-
     import pickle
     index_sample = {
         f"term_______{i}": [Posting(f"doc_id_{i**2}", i**4), Posting(f"doc_id_{i**2}", i**5)] for i in range(25)
     }
     test_string = ""
+    test_pickle_string_mix = ""
     for term, postings in index_sample.items():
         test_string += f"{term}\n"
+        test_pickle_string_mix += f"{term}\n"
         for posting in postings:
-            test_string += f"{posting.doc_id}|{posting.term_frequency}|{posting.tfidf_score}|{posting.url};"
+            test_string += f"{posting.doc_id}|{posting.term_frequency}"
+            print(str(pickle.dumps(posting)))
+            test_pickle_string_mix += str(pickle.dumps(posting))
         test_string += "\n"
     # print(test_string)
 
     print("dictionary size")
     print(sys.getsizeof(index_sample))
+    print("test_pickle_string_mix size")
+    exit()
+    print(sys.getsizeof(test_pickle_string_mix))
     print("string size")
     print(sys.getsizeof(test_string))
     print("encoded string size")

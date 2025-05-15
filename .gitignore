@@ -3,6 +3,7 @@
 *.zip
 ANALYST
 DEV
+partial_indexes
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
