@@ -26,7 +26,7 @@ class Indexer:
 
         self._num_docs = 0
 
-    def _load_document(self, doc_path: str) -> list[str, str, str]:
+    def _load_document(self, doc_path: Path) -> tuple[str, str, str]:
         with open(doc_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
@@ -40,10 +40,10 @@ class Indexer:
 
         return content, url, encoding
 
-    def _process_document(self, doc_path: str) -> None:
-        content, url, encoding = self._load_document(doc_path)
+    def _process_document(self, doc_path: Path) -> None:
+        content, url, _ = self._load_document(doc_path)
         # could use our own custom hashing of URL, but I'll pass
-        doc_id = Path(doc_path).stem
+        doc_id = doc_path.stem
 
         soup = BeautifulSoup(content, 'html.parser')
         tokens = get_tokens(soup.get_text(separator=" ", strip=True))

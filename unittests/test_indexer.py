@@ -3,6 +3,7 @@ import unittest
 from index.inverted_index import InvertedIndex
 from index.posting import Posting
 from index.indexer import Indexer
+from pathlib import Path
 import tempfile
 import os
 import glob
@@ -20,7 +21,7 @@ class TestInvertedIndex(unittest.TestCase):
 
     def test_process_document(self):
         indexer = Indexer('./ANALYST')
-        indexer._process_document('./unittests/doc_id_1.json')
+        indexer._process_document(Path('./unittests/doc_id_1.json'))
         self.assertEqual(
             indexer._index._current_batch['foo'],
             [Posting('doc_id_1', 6)])
@@ -33,8 +34,8 @@ class TestInvertedIndex(unittest.TestCase):
 
     def test_process_two_documents(self):
         indexer = Indexer('./ANALYST')
-        indexer._process_document('./unittests/doc_id_1.json')
-        indexer._process_document('./unittests/doc_id_2.json')
+        indexer._process_document(Path('./unittests/doc_id_1.json'))
+        indexer._process_document(Path('./unittests/doc_id_2.json'))
         self.assertEqual(
             indexer._index._current_batch['foo'],
             [Posting('doc_id_1', 6), Posting('doc_id_2', 3)])
@@ -47,7 +48,7 @@ class TestInvertedIndex(unittest.TestCase):
 
     def test_construct(self):
         indexer = Indexer(
-            './unittests', _inverted_index_factory=lambda: InvertedIndex(fp=self.ii_fp))
+            Path('./unittests'), _inverted_index_factory=lambda: InvertedIndex(fp=self.ii_fp)) # type: ignore
         indexer.construct()
         self.assertEqual(indexer.num_docs(), 2)
         self.assertEqual(indexer._index.num_terms(), 3)

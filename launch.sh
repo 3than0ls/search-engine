@@ -1,7 +1,7 @@
 #!/bin/sh
 
-export WEBPAGES_DIR="ANALYST/"
-# export WEBPAGES="DEV/"
+# export WEBPAGES_DIR="ANALYST/"
+export WEBPAGES_DIR="DEV/"
 
 # SPECIFY FLAG --no-test TO SKIP UNIT TESTS BEFORE LAUNCH
 if [ "$1" = "--no-test" ]; then
