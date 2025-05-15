@@ -8,7 +8,7 @@ Each index term is associated with an inverted list
 """
 
 from collections import defaultdict
-from index.posting import Posting
+from index.posting import Posting, POSTING_SIZE
 from utils.merge import merge
 from utils.logger import index_log
 import shelve
@@ -22,8 +22,9 @@ class InvertedIndex:
     def __init__(self, fp='./index.shelve') -> None:
         self._fp = fp
 
-        # batch size is based on number of postings, not number of terms, nor size of _current_batch
-        self._BATCH_SIZE = 1_000_000
+        # batch size is 32MB divided by the size of a Posting
+        # So roughly every 32MBs worth of postings will be synced per batch
+        self._BATCH_SIZE = (2 ** 28) / POSTING_SIZE
         self._current_batch = defaultdict(list)
         self._batch_num_postings = 0
 
