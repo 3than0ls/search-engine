@@ -1,7 +1,11 @@
 from utils import InvertedIndex, Posting, get_tokens, index_log
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 import json
 from pathlib import Path
+import os
+import warnings
+
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
 class Indexer:
@@ -47,12 +51,25 @@ class Indexer:
 
     def construct(self) -> None:
         """Construct a full inverted index from a collection of webpages specified in the constructor."""
+        index_log.info(f"Indexing documents from {self._webpages_dir}")
+
         for doc_path in self._webpages_dir.rglob('*.json'):
             self._process_document(doc_path)
-            if self._num_docs > 10:
-                print('stopping early')
-                break
-        print(self)
+
+        # sync the index one more time once done processing to save anything in the current batch
+        self._index.sync()
+
+        index_log.info(
+            f"Finished indexing all documents and created object {self}")
+
+        index_size = 0 if not os.path.exists(
+            self._index._fp) else os.path.getsize(self._index._fp) / 1024
+        summary = f"Index summary:\n" + \
+            f"Number of indexed documents: {self._num_docs}\n" + \
+            f"Number of unique tokens: {self._index.num_terms()}\n" + \
+            f"Total size of index on disk: {f"{index_size}KB at {self._index._fp}" or "NOT FOUND"}"
+        index_log.info(summary)
+        print(summary)
 
     def __str__(self):
         return f"<Indexer for {self._webpages_dir} | {self._num_docs} documents>"

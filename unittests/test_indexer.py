@@ -45,24 +45,14 @@ class TestInvertedIndex(unittest.TestCase):
             indexer._index._current_batch['baz'],
             [Posting('doc_id_1', 1), Posting('doc_id_2', 1)])
 
-    def test_construct_test_dir(self):
-        indexer = Indexer('./unittests')
-        indexer.construct()
-        self.assertEqual(indexer.num_docs(), 2)
-        self.assertEqual(indexer._index.num_terms(), 3)
-        self.assertEqual(indexer._index.num_postings(), 6)
-
-    def test_construct_test_dir_with_custom_inverted_index(self):
-        return
+    def test_construct(self):
         indexer = Indexer(
             './unittests', _inverted_index_factory=lambda: InvertedIndex(fp=self.ii_fp))
         indexer.construct()
         self.assertEqual(indexer.num_docs(), 2)
         self.assertEqual(indexer._index.num_terms(), 3)
         self.assertEqual(indexer._index.num_postings(), 6)
-        indexer._index._sync_batch()
-        import time
-        time.sleep(10)
+        indexer._index.sync()
 
 
 if __name__ == '__main__':

@@ -9,6 +9,9 @@ Each index term is associated with an inverted list
 
 from collections import defaultdict
 from utils.posting import Posting
+from utils.merge import merge
+from utils.logger import index_log
+import shelve
 
 
 class InvertedIndex:
@@ -19,21 +22,33 @@ class InvertedIndex:
     def __init__(self, fp='./index.shelve') -> None:
         self._fp = fp
 
-        self._BATCH_SIZE = 5
+        # batch size is based on number of postings, not number of terms, nor size of _current_batch
+        self._BATCH_SIZE = 1_000_000
         self._current_batch = defaultdict(list)
+        self._batch_num_postings = 0
 
         self._num_postings = 0
         self._num_terms = 0
-
-    def _sync_batch(self) -> None:
-        raise NotImplementedError()
-        self._current_batch.clear()
 
     def num_terms(self) -> int:
         return self._num_terms
 
     def num_postings(self) -> int:
         return self._num_postings
+
+    def sync(self) -> None:
+        """Syncs the batch to disk and clears the current batch."""
+        index_log.info(
+            f"Syncing batch of {self._batch_num_postings} postings to disk...")
+
+        with shelve.open(self._fp) as index:
+            for term, postings in self._current_batch.items():
+                shelved_postings = index.get(term, [])
+                # merge postings and current_postings
+                index[term] = merge(shelved_postings, postings)
+
+        self._batch_num_postings = 0
+        self._current_batch.clear()
 
     def add_posting(self, term: str, posting: Posting) -> None:
         """
@@ -60,6 +75,12 @@ class InvertedIndex:
         self._num_postings += 1
 
         self._current_batch[term].insert(insert_index, posting)
+
+        self._batch_num_postings += 1
+        # we don't want to do >= self._BATCH_SIZE, because the syncing is asynchronous,
+        # and thus after batch sizes has been exceeded, it'll spam more sync() calls
+        if self._batch_num_postings % self._BATCH_SIZE == 0:
+            self.sync()
 
     def __str__(self):
         return f"<Inverted Index stored at {self._fp} | {self._num_terms} terms, {self._num_postings} postings>"

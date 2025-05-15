@@ -13,3 +13,5 @@ if [ $? -ne 0 ]; then
 else
     .venv/bin/python3 main.py
 fi
+
+du -sh index.shelve ANALYST/
