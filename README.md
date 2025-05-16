@@ -4,7 +4,7 @@ See `TODO.md` for things that mut still be done
 
 ## Getting started
 
-Install dependencies with `python -m pip install -r requirements.txt`, or however else your environment needs to be set up.
+Install dependencies with `python -m pip install -r requirements.txt`, or however else your environment needs to be set up. `python -m venv .venv` might work, selecting it as your virtual environment, then activating, or however. See <https://docs.python.org/3/library/venv.html#creating-virtual-environments>.
 
 If on Windows, check `config.toml` and run `python main.py` or `python -m unittests discover ./unittest`
 
