@@ -7,4 +7,5 @@ def load_config(config_path='./config.html'):
     with open(config_path, 'rb') as f:
         data = tomllib.load(f)
         for key, value in data.items():
-            os.environ[key] = value
+            if os.environ.get(key) is None:
+                os.environ[key] = value

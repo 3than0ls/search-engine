@@ -1,7 +1,7 @@
 # These are all loaded into the environment (os.environ), stored as strings
 [INPUT]
 # ./DEV/ or ./ANALYST/
-WEBPAGES_DIR='./DEV/'
+WEBPAGES_DIR='./ANALYST/'
 
 [OUTPUT]
 # where to store the partial indexes that are eventually merged

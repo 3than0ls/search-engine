@@ -1,13 +1,9 @@
 # TODO
 
-1) Write report
+- Implement polyphase merging for merging the partial indexes into one index. (`merge.py`)
 
-2) Write optimizations to index by splitting it up into portions
+- Add term importance to Posting (or however else) when processing documents; headers should be more important than regular text (`posting.py`,`tokenize.py`, `indexer.py`). Will probably need to make major changes to how documents are loaded and processed in `indexer.py`
 
-3) Implement merging, but actually. POLYPHASE MERGING
+- Add tf-idf score to Posting (`posting.py`,`tokenize.py`, `indexer.py`). Will probably need to make major changes to how documents are loaded and processed in `indexer.py`
 
-- dump batches of postings, then at the end, polyphase merge them
-
-- then, for searching, split them up into different files a-z to optimize search speed
-
-4) Terms must be sorted alphabetically
+- Token stemming, Porter stemmer? (`tokenize.py`)
