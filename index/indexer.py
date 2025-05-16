@@ -1,14 +1,16 @@
 from index.inverted_index import InvertedIndex
 from index.posting import Posting
 from utils import get_tokens, index_log
-from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, MarkupResemblesLocatorWarning
 import json
 from pathlib import Path
 import os
 import warnings
 from collections import Counter
+import time
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
 
 class Indexer:
@@ -26,6 +28,8 @@ class Indexer:
         self._webpages_dir = Path(webpages_dir)
 
         self._num_docs = 0
+
+        self._start_time = 0
 
     def _load_document(self, doc_path: Path) -> tuple[str, str, str]:
         """Literally just a loader wrapper, but with some assertion checks that I KNOW will pass."""
@@ -62,6 +66,7 @@ class Indexer:
     def construct(self) -> None:
         """Construct a full inverted index from a collection of webpages specified in the constructor."""
         index_log.info(f"Indexing documents from {self._webpages_dir}")
+        start_time = time.time()
 
         with self._index as index:
             for doc_path in self._webpages_dir.rglob('*.json'):
@@ -75,16 +80,17 @@ class Indexer:
         index_log.info(
             f"Finished indexing all documents and created object {self}")
         out_dir = self._index._partial_index_dir
-        index_size = 0 if not os.path.exists(
-            out_dir) else os.path.getsize(out_dir) / 1024
+        index_size = sum(f.stat().st_size for f in out_dir.glob(
+            '**/*') if f.is_file()) / 1024
         summary = f"Index summary:\n" + \
             f"Number of indexed documents: {self._num_docs}\n" + \
             f"Number of unique tokens: {self._index.num_terms()}\n" + \
-            f"Total size of index(es) on disk: {f"{index_size}KB at {out_dir}" or "NOT FOUND"}"
+            f"Total size of index(es) on disk: {f"{index_size}KB at {out_dir}" or "NOT FOUND"}\n" + \
+            f"Time elapsed: {(time.time() - start_time):.2}s"
         index_log.info(summary)
-        print("-"*50)
+        print("-"*80)
         print(summary)
-        print("-"*50)
+        print("-"*80)
 
     def __str__(self):
         return f"<Indexer for {self._webpages_dir} | {self._num_docs} documents>"
