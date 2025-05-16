@@ -86,7 +86,7 @@ class Indexer:
             f"Number of indexed documents: {self._num_docs}\n" + \
             f"Number of unique tokens: {self._index.num_terms()}\n" + \
             f"Total size of index(es) on disk: {f"{index_size}KB at {out_dir}" or "NOT FOUND"}\n" + \
-            f"Time elapsed: {(time.time() - start_time):.2}s"
+            f"Time elapsed: {(time.time() - start_time):.2f}s"
         index_log.info(summary)
         print("-"*80)
         print(summary)

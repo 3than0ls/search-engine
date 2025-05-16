@@ -15,7 +15,7 @@ class Posting:
     def __str__(self):
         return f"<Posting with doc ID {self.doc_id}>"
 
-    def serialize(self):
+    def serialize(self) -> str:
         """Return a serialized representation for disk storage."""
         return POSTING_DELIMETER.join([self.doc_id, str(self.term_frequency)])
 
