@@ -2,7 +2,6 @@
 
 # export WEBPAGES_DIR="ANALYST/"
 export WEBPAGES_DIR="DEV/"
-
 export PARTIAL_INDEX_DIR="partial_indexes/"
 
 # SPECIFY FLAG --no-test TO SKIP UNIT TESTS BEFORE LAUNCH
