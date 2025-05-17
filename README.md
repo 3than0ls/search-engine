@@ -1,6 +1,6 @@
 # Search Engine
 
-See `TODO.md` for things that mut still be done
+See `TODO.md` for things that mut still be done.
 
 ## Getting started
 
@@ -16,7 +16,9 @@ If on Linux, config variables are exported as environment variables. Run `./laun
 
 Program starts at `main.py`, where it creates an `Indexer` instance and runs `.construct()`, which does all the work.
 
-The `Indexer` constructs a `InvertedIndex`, which goes through the webpages to construct `PostingList`s, which are containers for `Posting`s. The `InvertedIndex` is stored in partial indexes, which are serialized and saved in batches, which will then be merged together later (this is a requirement)
+The `Indexer` works by processing webpages to construct several `PartialIndex`es, which are containers for `PostingList`s, which are containers for `Posting`s. The `PartialIndex`es are serialized and stored in a directory temporarily, then merged all together to output into another directory (specification requirements)
+
+The `InvertedIndex` is created as a interface for that directory, nothing more. Eventually, `InvertedIndex` will be used to query the index data for searches.
 
 ### Serialization
 
@@ -32,6 +34,8 @@ They're serialized in a text format and stored in .txt files, nothing shelves no
 
 This will make it easy to read one line at a time, easy to split (their delimeters are known), and easy to merge.
 
+How it is serialized isn't actually important; in fact we'll probably have to change the serialization A LOT. Add more info like pointers and td-idf scores, and then make it smaller and more compressed. Then maybe document ID mappings; serialization must be worked on.
+
 ### Directory `index`
 
 #### `posting.py`
@@ -44,7 +48,11 @@ A class representing a list of postings, with an algorithm to add postings to th
 
 #### `inverted_index.py`
 
-A class representing the entire inverted index. During creation, it will periodically serialize and dump partial indexes. When adding postings, run it using a context manager, as seen in `Indexer.construct`. Also keeps track of number of postings and number of terms processed, used for M1 analytics.
+2am i'm too tired to write docs just ask me
+
+#### `partial_index.py`
+
+2am i'm too tired to write docs just ask me
 
 #### `indexer.py`
 

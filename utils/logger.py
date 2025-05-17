@@ -21,7 +21,7 @@ def _create_logs():
     index_log = logging.getLogger("INDEXER")
     index_log.setLevel(logging.INFO)
 
-    if not index_log.handlers and os.environ.get("TESTING") != "true":
+    if not index_log.handlers:
         file_handler = logging.FileHandler(index_log_path)
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -33,7 +33,7 @@ def _create_logs():
     engine_log = logging.getLogger("ENGINE")
     engine_log.setLevel(logging.INFO)
 
-    if not engine_log.handlers and os.environ.get("TESTING") != "true":
+    if not engine_log.handlers:
         file_handler = logging.FileHandler(engine_log_path)
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s')

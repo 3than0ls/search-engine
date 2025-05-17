@@ -1,5 +1,6 @@
 from index.posting import Posting
 from index.delimeters import POSTING_LIST_DELIMETER
+from typing import Iterator
 
 
 class PostingList:
@@ -10,6 +11,9 @@ class PostingList:
 
     def __len__(self) -> int:
         return len(self._postings)
+
+    def __iter__(self) -> Iterator[Posting]:
+        yield from self._postings
 
     def add_posting(self, posting: Posting) -> None:
         """       
