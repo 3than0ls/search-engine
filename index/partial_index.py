@@ -3,7 +3,7 @@ from index.posting import Posting
 from index.posting_list import PostingList
 from index.delimeters import INVERTED_INDEX_KV_DELIMETER, INVERTED_INDEX_DELIMETER
 from utils.logger import index_log
-import os
+import bisect
 from pathlib import Path
 
 
@@ -18,6 +18,7 @@ class PartialIndex:
         self._partial_index_dir = partial_index_dir
 
         self._index = defaultdict(PostingList)
+        self._sorted_terms: list[str] = []
         self._id = partial_index_id
         self._fp = Path(
             f"{self._partial_index_dir}/partial_index_{self._id:03}.txt")
@@ -43,17 +44,18 @@ class PartialIndex:
 
         # may want to do wb and .encode('utf-8') for performance benefits (smaller disk size)
         with open(path, 'w', encoding='utf-8') as f:
-            for term, postings in self._index.items():
-                line = f"{term}{INVERTED_INDEX_KV_DELIMETER}{postings.serialize()}"
+            for term in self._sorted_terms:
+                postings = self._index[term]
+                line = f"{term}{INVERTED_INDEX_KV_DELIMETER}{postings.serialize()}{INVERTED_INDEX_DELIMETER}"
                 f.write(line)
-                f.write(INVERTED_INDEX_DELIMETER)
 
     def add_posting(self, term: str, posting: Posting) -> None:
         """
         Add a posting to the inverted index. Postings are ordered by document ID.
         """
+        if term not in self._index:
+            bisect.insort(self._sorted_terms, term)
         self._index[term].add_posting(posting)
-
         self._num_postings += 1
 
     def __str__(self):

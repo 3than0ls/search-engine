@@ -4,13 +4,14 @@ from pathlib import Path
 from index.inverted_index import InvertedIndex
 from index.posting import Posting
 from utils import load_config
+import os
 
 
 class TestInvertedIndex(unittest.TestCase):
     def setUp(self):
         load_config()
         self.ii_dir = tempfile.TemporaryDirectory()
-        self.ii = InvertedIndex(self.ii_dir.name)
+        self.ii = InvertedIndex(Path(self.ii_dir.name))
 
     def tearDown(self):
         self.ii_dir.cleanup()

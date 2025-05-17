@@ -15,3 +15,7 @@ InvertedIndex is the interface for accessing ALL data in the index; regardless o
 Indexer will construct several PartialIndex-es, merge them, and then produce a full InvertedIndex
 
 InvertedIndex will have 2 files on disk:  the serialized inverted index (post partial index merge), and a auxiliary secondary index to seek terms, which can be loaded into memory (see lecture 18)
+
+
+
+WRITE INVERTED INDEX TESTS FOR MERGING, ADD DOCSTRING TO MERGE
