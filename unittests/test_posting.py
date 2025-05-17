@@ -31,6 +31,17 @@ class TestPosting(unittest.TestCase):
         self.assertEqual(plist.serialize(),
                          POSTING_LIST_DELIMETER.join([posting.serialize() for posting in sorted(postings)]))
 
+    def test_posting_list_yield(self):
+        plist = PostingList()
+        postings = [Posting('id4', 1), Posting('id2', 1),
+                    Posting('id3', 1), Posting('id1', 1)]
+        for posting in postings:
+            plist.add_posting(posting)
+
+        posting_sorted = sorted(postings)
+        for i, posting in enumerate(plist):
+            self.assertEqual(posting, posting_sorted[i])
+
 
 if __name__ == '__main__':
     unittest.main()
