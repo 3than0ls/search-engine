@@ -29,7 +29,7 @@ def _tokenize(text: str) -> Counter:
     return tokens
 
 
-def get_tokens(text: str) -> Counter:
+def get_tokens(text: str) -> Counter[str]:
     """
     Returns a Counter object representing the count of all tokens.
     Typically this text is extracted from a BeautifulSoup via get_text().

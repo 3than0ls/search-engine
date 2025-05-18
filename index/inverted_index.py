@@ -10,7 +10,6 @@ Each index term is associated with an inverted list
 from collections import defaultdict
 from index.posting import Posting
 from index.posting_list import PostingList
-from index.delimeters import INVERTED_INDEX_KV_DELIMETER, INVERTED_INDEX_DELIMETER
 from utils.logger import index_log
 import os
 from pathlib import Path

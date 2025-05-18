@@ -16,47 +16,13 @@ If on Linux, config variables are exported as environment variables. Run `./laun
 
 Program starts at `main.py`, where it creates an `Indexer` instance and runs `.construct()`, which does all the work.
 
-The `Indexer` works by processing webpages to construct several `PartialIndex`es, which are containers for `PostingList`s, which are containers for `Posting`s. The `PartialIndex`es are serialized and stored in a directory temporarily, then merged all together to output into another directory (specification requirements)
+The `Indexer` works by processing webpages to construct several `PartialIndex`es, which are map containers for `Term`s to `PostingList`s, which are themselves are containers for `Posting`s. The `PartialIndex`es are serialized and stored in a directory temporarily, then merged all together to output into another directory (specification requirements)
 
-The `InvertedIndex` is created as a interface for that directory, nothing more. Eventually, `InvertedIndex` will be used to query the index data for searches.
+The `InvertedIndex` is created as a interface for that directory, nothing more. `InvertedIndex` is used to query the index data for searches.
 
 ### Serialization
 
-`InvertedIndex` will store partial indexes in disk in the function `_dump_partial_index`. It relies on `Posting` and `PostingList` both have a serialization method, joined by delimeters found in `index/delimeters.py`.
-
-They're serialized in a text format and stored in .txt files, nothing shelves no json. It'll literally look something like
-
-```py
-[term1]:posting_1_doc_id|posting_1_attr,posting_2_doc_id|posting_2_attr,...
-[term2]:posting_1_doc_id|posting_1_attr,posting_2_doc_id|posting_2_attr,...
-...
-```
-
-This will make it easy to read one line at a time, easy to split (their delimeters are known), and easy to merge.
-
-How it is serialized isn't actually important; in fact we'll probably have to change the serialization A LOT. Add more info like pointers and td-idf scores, and then make it smaller and more compressed. Then maybe document ID mappings; serialization must be worked on.
-
-### Directory `index`
-
-#### `posting.py`
-
-A dataclass representing a posting
-
-#### `posting_list.py`
-
-A class representing a list of postings, with an algorithm to add postings to the correct location.
-
-#### `inverted_index.py`
-
-2am i'm too tired to write docs just ask me
-
-#### `partial_index.py`
-
-2am i'm too tired to write docs just ask me
-
-#### `indexer.py`
-
-A class representing the responsible for loading, processing, and indexing documents and adding postings to `InvertedIndex`. Also responsible for outputting M1 analytics.
+Everything from `PartialIndex` down has a `serialize()` method that serializes it in binary. I can explain it if your interested but it just uses Python's `struct` library's `.pack()`, some string encoding, and then deserialization involves `struct` library's `.unpack()` and some manual parsing.
 
 ### Directory `utils`
 
