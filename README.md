@@ -10,31 +10,53 @@ If on Windows, check `config.toml` and run `python main.py` or `python -m unitte
 
 If on Linux, config variables are exported as environment variables. Run `./launch.sh` or `./test.sh`. This assumes your virtual environment is stored in .venv of the CWD.
 
-## Code
 
-### High level overview
+## High level overview
 
-Program starts at `main.py`, where it creates an `Indexer` instance and runs `.construct()`, which does all the work.
+Program starts at `main.py`, where it creates an `Indexer` instance and runs `.construct()`, which constructs the inverted index. From then, the class `InvertedIndex` can be used to interface with the serialized disk data that is the inverted index.
 
-The `Indexer` works by processing webpages to construct several `PartialIndex`es, which are map containers for `Term`s to `PostingList`s, which are themselves are containers for `Posting`s. The `PartialIndex`es are serialized and stored in a directory temporarily, then merged all together to output into another directory (specification requirements)
+The `Indexer` works by processing webpages to construct several `PartialIndex`es, which are map containers for `Term`s to `PostingList`s, which are themselves are containers for `Posting`s. The `PartialIndex`es are serialized and stored in a directory temporarily, then merged all together with polyphase merge to produce the file for the inverted index, along with auxiliary data files.
 
-The `InvertedIndex` is created as a interface for that directory, nothing more. `InvertedIndex` is used to query the index data for searches.
+The `InvertedIndex` is created as a interface for the inverted index disk data. nothing more. `InvertedIndex` will be used to query the data, but not modify it.
+
+## Index Creation
+
+### Index Creation Graph
+
+A graph of the process looks something like this:
+
+```mermaid
+graph LR;
+    webpages@{ shape: circle, label: "Webpages\n(ANALYST or DEV)" }
+    partial_indexes@{ shape: docs, label: "Partial Indexes" }
+    inverted_index@{ shape: lin-cyl, label: "Inverted Index\nAuxiliary Files" }
+
+    webpages -- Indexer (PartialIndexBuilder) --> partial_indexes;
+    partial_indexes -- Indexer (PartialIndexMerger) --> inverted_index;
+```
 
 ### Serialization
 
-Everything from `PartialIndex` down has a `serialize()` method that serializes it in binary. I can explain it if your interested but it just uses Python's `struct` library's `.pack()`, some string encoding, and then deserialization involves `struct` library's `.unpack()` and some manual parsing.
+Everything from `PartialIndex` down has a `serialize()` method that serializes it in binary. Utilizes Python's `struct` library's `.pack()`, some string encoding, and then deserialization involves `struct` library's `.unpack()` and some manual parsing.
 
-### Directory `utils`
+## Index Querying
 
-#### config.py
+Has not yet been implemented. All querying will be done with the `InvertedIndex` object, which provides an interface for code to interact with the inverted index on disk.
+
+## Directory `utils`
+
+### config.py
 
 Exports `load_config`, which loads in config settings from config.toml
 
-#### logger.py
+### logger.py
 
 Exports `index_log` and `engine_log`, which are used to log important information in respective .log files.
 
+### tokenize.py
 
-#### tokenize.py
+Exports `get_postings`, which returns a mapping of terms to posting lists to be stored in the inverted index.
 
-Exports `get_tokens`, which returns a Pythoun Counter object of tokens to their token count.
+## Unit testing
+
+To run unit testing, run `python -m unittests discover ./unittest`. Not required to write unit tests, I just write them because it makes it easier in the long run.
