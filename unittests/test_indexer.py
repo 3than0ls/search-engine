@@ -25,7 +25,7 @@ class TestInvertedIndex(unittest.TestCase):
             Path(self.pi_dir.name),
             Path(self.ii_dir.name))
         content, url, encoding = indexer._load_document(
-            Path('./unittests/1.json'))
+            Path('./unittests/0.json'))
 
         self.assertEqual(content, 'foo foo foo foo foo foo bar bar bar baz')
         self.assertEqual(url, 'foo.com')
@@ -36,9 +36,9 @@ class TestInvertedIndex(unittest.TestCase):
             Path('./unittests'),
             Path(self.pi_dir.name),
             Path(self.ii_dir.name))
-        indexer._process_document(Path('./unittests/1.json'))
+        indexer._process_document(Path('./unittests/0.json'))
         self.assertEqual(indexer._num_docs, 1)
-        indexer._process_document(Path('./unittests/2.json'))
+        indexer._process_document(Path('./unittests/1.json'))
         self.assertEqual(indexer._num_docs, 2)
 
     def test_construct_partial_index(self):
@@ -51,8 +51,8 @@ class TestInvertedIndex(unittest.TestCase):
         self.assertEqual(
             len(list(Path(self.pi_dir.name).iterdir())), 1
         )
-        doc_1_id = 1
-        doc_2_id = 2
+        doc_1_id = 1 - 1
+        doc_2_id = 2 - 1
         self.assertEqual(
             indexer._partial_index._index[Term('foo')]._postings,
             [Posting(doc_1_id, 6), Posting(doc_2_id, 3)])
@@ -74,6 +74,7 @@ class TestInvertedIndex(unittest.TestCase):
         self.assertTrue(path.exists())
         self.assertTrue((path / 'inverted_index.bin').exists())
         self.assertTrue((path / 'terms_map.bin').exists())
+        self.assertTrue((path / 'document_map.bin').exists())
         self.assertEqual(
             len(list(path.iterdir())), 2
         )

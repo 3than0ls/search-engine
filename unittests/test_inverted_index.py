@@ -23,8 +23,8 @@ class TestInvertedIndex(unittest.TestCase):
     def test_search_term_returns(self):
         results = self.index._search_term(Term('foo'))
         oracle = [
-            Posting(1, 6),
-            Posting(2, 3)
+            Posting(0, 6),
+            Posting(1, 3)
         ]
         for i, result in enumerate(results):
             self.assertEqual(result, oracle[i])

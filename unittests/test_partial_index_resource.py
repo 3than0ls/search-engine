@@ -71,6 +71,6 @@ class TestPartialIndexResource(unittest.TestCase):
         with PartialIndexResource(Path(self.pi_dir.name) / 'partial_index_000.bin') as f:
             item = f._read_item()
             plist_bar = PostingList()
-            plist_bar.add_posting(Posting(1, 3))
-            plist_bar.add_posting(Posting(2, 6))
+            plist_bar.add_posting(Posting(0, 3))
+            plist_bar.add_posting(Posting(1, 6))
             self.assertEqual(item, (Term('bar'), plist_bar))

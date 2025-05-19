@@ -1,9 +1,10 @@
 import unittest
-from utils import get_tokens
+from utils import get_postings
 
 
 class TestTokenize(unittest.TestCase):
     def test_get_words(self):
+        raise NotImplementedError("Write tokenization and get_postings tests.")
         words = get_tokens("one two two hello world qwerty uiop a 1")
         self.assertEqual(words['one'], 1)
         self.assertEqual(words['two'], 2)
