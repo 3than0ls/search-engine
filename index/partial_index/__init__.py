@@ -1,3 +1,3 @@
 from index.partial_index.partial_index import PartialIndex
 from index.partial_index.partial_index_builder import PartialIndexBuilder
-from index.partial_index.partial_index_merging import PartialIndexMerger
+from index.partial_index.partial_index_merger import PartialIndexMerger

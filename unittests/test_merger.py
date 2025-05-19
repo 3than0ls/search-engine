@@ -1,6 +1,6 @@
 import unittest
 
-from index.partial_index.partial_index_merging import PartialIndexMerger
+from index.partial_index.partial_index_merger import PartialIndexMerger
 from index.partial_index.partial_index import PartialIndex
 from index.posting import Posting
 from index.posting_list import PostingList
