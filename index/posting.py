@@ -14,10 +14,10 @@ class Posting:
     # tfidf_score: float = 1
     # url: str = ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"<Posting | {self.doc_id}, {self.term_frequency}>"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     def serialize(self) -> bytes:

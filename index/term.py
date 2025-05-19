@@ -9,10 +9,10 @@ TERM_LENGTH_SIZE = struct.calcsize(TERM_LENGTH_FORMAT)
 class Term:
     term: str
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.term)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return isinstance(other, Term) and self.term == other.term
 
     def serialize(self) -> bytes:

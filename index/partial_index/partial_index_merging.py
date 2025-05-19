@@ -8,7 +8,7 @@ from typing import Deque, Iterator
 class PartialIndexMerger:
     """Utilize polyphase merge to merge the partial indexes into a single index."""
 
-    def __init__(self, partial_index_dir: Path, index_dir: Path):
+    def __init__(self, partial_index_dir: Path, index_dir: Path) -> None:
         self._partial_index_dir = partial_index_dir
         self._index_dir = index_dir
 
@@ -103,7 +103,7 @@ class PartialIndexMerger:
             for line in self._merge_partial_index_resources(left, right):
                 out.write(line)
 
-    def merge(self):
+    def merge(self) -> None:
         """
         Utilize polyphase merge to merge the partial indexes (already sorted) into a single inverted index.
         """

@@ -17,7 +17,7 @@ class Indexer:
     This class should be a singleton; it will only be created and constructed once per program execution.
     """
 
-    def __init__(self, webpages_dir: Path, partial_index_dir: Path, index_dir: Path):
+    def __init__(self, webpages_dir: Path, partial_index_dir: Path, index_dir: Path) -> None:
         # validate directories
         if not webpages_dir.is_dir():
             raise ValueError(
@@ -90,5 +90,5 @@ class Indexer:
         index_log.info(summary)
         print("-"*80)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"<Indexer for {self._webpages_dir}>"

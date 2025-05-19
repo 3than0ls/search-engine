@@ -1,7 +1,7 @@
 from collections import Counter
 
 
-def _tokenize(text: str) -> Counter:
+def _tokenize(text: str) -> Counter[str]:
     """
     ADAPTED FROM ASSIGNMENT 1
     Returns a Counter object representing the count of all tokens.

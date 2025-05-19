@@ -8,7 +8,7 @@ engine_log = None
 _created = False
 
 
-def _create_logs():
+def _create_logs() -> None:
     global index_log, engine_log, _created
 
     if _created:

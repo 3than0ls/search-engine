@@ -57,7 +57,7 @@ class PartialIndexBuilder:
         self._num_docs += 1
         return tokens
 
-    def _dump_current_partial_index(self):
+    def _dump_current_partial_index(self) -> None:
         """Serialize current partial index to disk. Used in `self._create_new_partial_index()`"""
         self._partial_index_dir.mkdir(exist_ok=True)
         fname = f"partial_index_{self._partial_index_count:03}.bin"
@@ -78,7 +78,7 @@ class PartialIndexBuilder:
         index_log.info(
             f"Writing current partial index {path} took {(end - start):.2f}s")
 
-    def _create_new_partial_index(self):
+    def _create_new_partial_index(self) -> None:
         """Sets the _partial_index attribute to a new PartialIndex object, done when needing to dump old partial index and start anew."""
         self._dump_current_partial_index()
         self._partial_index_count += 1

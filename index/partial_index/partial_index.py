@@ -81,13 +81,13 @@ class PartialIndex:
 
             yield (term, postings_list)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return isinstance(other, PartialIndex) and self._sorted_terms == other._sorted_terms and self._index == other._index and self._num_postings == other._num_postings
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"<PartialIndex | {self.num_terms()} terms, {self._num_postings} postings>"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
 
@@ -107,7 +107,7 @@ class PartialIndexResource:
     def __iter__(self) -> Iterator[Tuple[Term, PostingList]]:
         return self.read_items()
 
-    def read_item(self) -> Optional[Tuple[Term, PostingList]]:
+    def _read_item(self) -> Optional[Tuple[Term, PostingList]]:
         """
         Read a single item and it's posting list from the partial index. Assumes the posting list is in absolute correct format. Must be accessed within a context manager.
         """
@@ -130,5 +130,5 @@ class PartialIndexResource:
         Return a generator of items (term, postings) from the partial index.
         Probably not used at all.
         """
-        while item := self.read_item():
+        while item := self._read_item():
             yield item

@@ -34,10 +34,10 @@ class PostingList:
         elif isinstance(value, slice):
             return self._postings[value.start:value.stop:value.step]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"<PostingList | {len(self._postings)} postings>"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     def add_posting(self, posting: Posting) -> None:

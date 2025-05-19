@@ -59,7 +59,7 @@ class TestPartialIndexResource(unittest.TestCase):
         pi = self.construct_custom_pi()
         with PartialIndexResource(Path(self.pi_dir.name) / 'out.bin') as f:
             i = 0
-            while item := f.read_item():
+            while item := f._read_item():
                 term, posting_list = item
                 self.assertEqual(term, pi._sorted_terms[i])
                 self.assertEqual(posting_list, pi._index[term])
@@ -69,7 +69,7 @@ class TestPartialIndexResource(unittest.TestCase):
         # this test has to do with actual hardcoded values, and will fail later when we change Posting, can comment it out then,
         self.construct_pi()
         with PartialIndexResource(Path(self.pi_dir.name) / 'partial_index_000.bin') as f:
-            item = f.read_item()
+            item = f._read_item()
             plist_bar = PostingList()
             plist_bar.add_posting(Posting(1, 3))
             plist_bar.add_posting(Posting(2, 6))
