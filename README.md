@@ -19,6 +19,12 @@ The `Indexer` works by processing webpages to construct several `PartialIndex`es
 
 The `InvertedIndex` is created as a interface for the inverted index disk data. nothing more. `InvertedIndex` will be used to query the data, but not modify it.
 
+## Configuration
+
+`config.toml` stores key configurations as to where to search or place files.
+
+Webpages are stored in `WEBPAGES_DIR`, Partial indexes are stored in `PARTIAL_INDEX_DIR`, and inverted indexes and it's auxiliary files are stored in `INDEX_DIR`.
+
 ## Index Creation
 
 ### Index Creation Graph
