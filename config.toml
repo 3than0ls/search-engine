@@ -4,7 +4,3 @@
 WEBPAGES_DIR='./ANALYST/'
 PARTIAL_INDEX_DIR='./partial_indexes/'
 INDEX_DIR='./inverted_index'
-
-[TESTING]
-# whether or not to run tests before launching
-TESTING='true'
