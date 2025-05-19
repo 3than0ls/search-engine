@@ -6,7 +6,7 @@ DEV
 partial_indexes*
 launch.sh
 test.sh
-inverted_indexes*
+inverted_index*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
