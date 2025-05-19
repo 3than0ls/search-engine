@@ -3,6 +3,7 @@ from collections import deque
 from index.partial_index.partial_index import PartialIndexResource
 from index.posting_list import PostingList
 from typing import Deque, Iterator
+from utils import index_log
 
 
 class PartialIndexMerger:
@@ -115,9 +116,12 @@ class PartialIndexMerger:
             one = self._runs.popleft()
             two = self._runs.popleft()
             run_name = self._partial_index_dir / f"tmp_merge_run_{run}.bin"
+            index_log.info(f"Merging {one} and {two} to {run_name}")
             self._merge_partial_indexes(run_name, one, two)
             self._runs.append(run_name)
             run += 1
 
         fully_merged = self._runs.popleft()
         fully_merged.rename(self._index_dir / "inverted_index.bin")
+        index_log.info(
+            f"Placing inverted index at {self._index_dir / "inverted_index.bin"}")
