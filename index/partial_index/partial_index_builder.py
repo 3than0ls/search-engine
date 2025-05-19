@@ -1,11 +1,12 @@
 from index.term import Term
 from index.partial_index import PartialIndex
-from index import Posting, PostingList, Term
+from index.term import Term
+from index.posting_list import PostingList
+from index.posting import Posting
 from utils import get_postings, index_log
 from bs4 import BeautifulSoup
 import json
 from pathlib import Path
-from collections import Counter
 from typing import Mapping
 import time
 

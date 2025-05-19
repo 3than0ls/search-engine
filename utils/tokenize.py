@@ -1,7 +1,9 @@
 from collections import Counter, defaultdict
 from bs4 import BeautifulSoup
 from typing import Mapping
-from index import Posting, Term, PostingList
+from index.posting_list import PostingList
+from index.term import Term
+from index.posting import Posting
 
 
 def _tokenize(text: str) -> Counter[str]:
