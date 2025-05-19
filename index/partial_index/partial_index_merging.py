@@ -1,13 +1,13 @@
 from pathlib import Path
 from collections import deque
 from index.posting import Posting
-from index.partial_index import PartialIndex, PartialIndexResource
+from index.partial_index.partial_index import PartialIndex, PartialIndexResource
 from index.posting_list import PostingList
 from index.term import Term
 from typing import Deque, Iterator, Generator, Tuple
 
 
-class Merger:
+class PartialIndexMerger:
     """Utilize polyphase merge to merge the partial indexes into a single index."""
 
     def __init__(self, partial_index_dir: Path, index_dir: Path):

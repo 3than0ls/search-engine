@@ -1,7 +1,7 @@
 import unittest
 import tempfile
 from pathlib import Path
-from index.partial_index import PartialIndex
+from index.partial_index.partial_index import PartialIndex
 from index.term import Term
 from index.posting import Posting
 

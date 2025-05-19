@@ -1,8 +1,8 @@
 import unittest
 
 from index.inverted_index import InvertedIndex
-from index.merger import Merger
-from index.partial_index import PartialIndex, PartialIndexResource
+from index.partial_index.partial_index_merging import PartialIndexMerger
+from index.partial_index.partial_index import PartialIndex, PartialIndexResource
 from index.posting import Posting
 from index.posting_list import PostingList
 from index.term import Term
@@ -25,7 +25,7 @@ class TestPartialIndexResource(unittest.TestCase):
     def construct_pi(self):
         indexer = Indexer(Path('./unittests'), Path(self.pi_dir.name),
                           Path(self.ii_dir.name))
-        indexer._construct_partial_indexes()
+        indexer._build_partial_indexes()
 
     def construct_custom_pi(self) -> PartialIndex:
         pi = PartialIndex()

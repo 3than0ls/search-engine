@@ -1,8 +1,8 @@
 import unittest
 
 from index.inverted_index import InvertedIndex
-from index.merger import Merger
-from index.partial_index import PartialIndex, PartialIndexResource
+from index.partial_index.partial_index_merging import PartialIndexMerger
+from index.partial_index.partial_index import PartialIndex, PartialIndexResource
 from index.posting import Posting
 from index.posting_list import PostingList
 from index.term import Term
@@ -25,11 +25,12 @@ class TestMerger(unittest.TestCase):
     def construct_pi(self):
         indexer = Indexer(Path('./unittests'), Path(self.pi_dir.name),
                           Path(self.ii_dir.name))
-        indexer._construct_partial_indexes()
+        indexer._build_partial_indexes()
 
     def test_merge_postings_lists(self):
         self.construct_pi()
-        merger = Merger(Path(self.pi_dir.name), Path(self.ii_dir.name))
+        merger = PartialIndexMerger(
+            Path(self.pi_dir.name), Path(self.ii_dir.name))
         left = PostingList()
         right = PostingList()
         left_postings = [Posting(1, 1), Posting(3, 2), Posting(5, 3)]
@@ -57,7 +58,8 @@ class TestMerger(unittest.TestCase):
         for term in right_term1:
             right_pl.add_posting(term)
 
-        merger = Merger(Path(self.pi_dir.name), Path(self.ii_dir.name))
+        merger = PartialIndexMerger(
+            Path(self.pi_dir.name), Path(self.ii_dir.name))
         merged = merger._merge_postings_lists(left_pl, right_pl)
         self.assertEqual(merged._postings, sorted(
             left_term1 + right_term1))
@@ -70,7 +72,8 @@ class TestMerger(unittest.TestCase):
 
     def test_merge_postings_list_assertes(self):
         self.construct_pi()
-        merger = Merger(Path(self.pi_dir.name), Path(self.ii_dir.name))
+        merger = PartialIndexMerger(
+            Path(self.pi_dir.name), Path(self.ii_dir.name))
         left = PostingList()
         right = PostingList()
         left.add_posting(Posting(1, 1))
@@ -111,7 +114,8 @@ class TestMerger(unittest.TestCase):
             self.assertEqual(PartialIndex.deserialize(f1.read()), pi_left)
             self.assertEqual(PartialIndex.deserialize(f2.read()), pi_right)
 
-        merger = Merger(Path(self.pi_dir.name), Path(self.ii_dir.name))
+        merger = PartialIndexMerger(
+            Path(self.pi_dir.name), Path(self.ii_dir.name))
         merger._merge_partial_indexes(
             Path(self.pi_dir.name) / 'out.bin',
             Path(self.pi_dir.name) / 'partial_index_001.bin',
@@ -154,7 +158,8 @@ class TestMerger(unittest.TestCase):
             self.assertEqual(PartialIndex.deserialize(f1.read()), pi_left)
             self.assertEqual(PartialIndex.deserialize(f2.read()), pi_right)
 
-        merger = Merger(Path(self.pi_dir.name), Path(self.ii_dir.name))
+        merger = PartialIndexMerger(
+            Path(self.pi_dir.name), Path(self.ii_dir.name))
         merger._merge_partial_indexes(
             Path(self.pi_dir.name) / 'out.bin',
             Path(self.pi_dir.name) / 'partial_index_001.bin',
@@ -236,7 +241,8 @@ class TestMerger(unittest.TestCase):
                     f.read()), partial_indexes[i])
         self.assertEqual(num_postings, pi.num_postings())
 
-        merger = Merger(Path(self.pi_dir.name), Path(self.ii_dir.name))
+        merger = PartialIndexMerger(
+            Path(self.pi_dir.name), Path(self.ii_dir.name))
         merger.merge()
 
         with open(Path(self.ii_dir.name) / 'inverted_index.bin', 'rb') as f:

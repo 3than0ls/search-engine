@@ -1,12 +1,12 @@
 import unittest
 
-from index.inverted_index import InvertedIndex
 from index.posting import Posting
 from index.term import Term
 from index.indexer import Indexer
 from pathlib import Path
 import tempfile
 from utils import load_config
+from index.partial_index import PartialIndexBuilder
 
 
 class TestInvertedIndex(unittest.TestCase):
@@ -19,11 +19,8 @@ class TestInvertedIndex(unittest.TestCase):
         self.ii_dir.cleanup()
         self.pi_dir.cleanup()
 
-    def create_ii(self, _):
-        return InvertedIndex(Path(self.ii_dir.name))
-
     def test_load_doc(self):
-        indexer = Indexer(
+        indexer = PartialIndexBuilder(
             Path('./unittests'),
             Path(self.pi_dir.name),
             Path(self.ii_dir.name))
@@ -35,21 +32,21 @@ class TestInvertedIndex(unittest.TestCase):
         self.assertEqual(encoding, 'utf-8')
 
     def test_process_doc(self):
-        indexer = Indexer(
+        indexer = PartialIndexBuilder(
             Path('./unittests'),
             Path(self.pi_dir.name),
             Path(self.ii_dir.name))
         indexer._process_document(Path('./unittests/1.json'))
-        self.assertEqual(indexer.num_docs(), 1)
+        self.assertEqual(indexer._num_docs, 1)
         indexer._process_document(Path('./unittests/2.json'))
-        self.assertEqual(indexer.num_docs(), 2)
+        self.assertEqual(indexer._num_docs, 2)
 
     def test_construct_partial_index(self):
-        indexer = Indexer(
+        indexer = PartialIndexBuilder(
             Path('./unittests'),
             Path(self.pi_dir.name),
             Path(self.ii_dir.name))
-        indexer._construct_partial_indexes()
+        indexer.build()
         self.assertEqual(indexer._partial_index_count, 1)
         self.assertEqual(
             len(list(Path(self.pi_dir.name).iterdir())), 1
@@ -71,7 +68,7 @@ class TestInvertedIndex(unittest.TestCase):
             Path('./unittests'),
             Path(self.pi_dir.name),
             Path(self.ii_dir.name))
-        indexer._construct_partial_indexes()
+        indexer._build_partial_indexes()
         indexer._merge_partial_indexes()
         path = Path(self.ii_dir.name)
         self.assertTrue(path.exists())
