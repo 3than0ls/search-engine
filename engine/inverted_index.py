@@ -34,5 +34,12 @@ class InvertedIndex:
             index = PartialIndex.deserialize(f.read())._index
             return index[term]
 
+    def retrieve(self, query: str) -> list[str]:
+        """
+        Given a query string, return a list of documents.
+        TODO: Implement.
+        """
+        raise NotImplementedError
+
     def __str__(self):
         return f"<InvertedIndex stored at {self._index_dir} | {self._num_terms} terms, {self._num_postings} postings>"
