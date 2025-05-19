@@ -30,6 +30,18 @@ class TestPosting(unittest.TestCase):
              Posting(3, 1), Posting(4, 1)]
         )
 
+    def test_posting_list(self):
+        plist = PostingList()
+        postings = [Posting(4, 1), Posting(2, 1),
+                    Posting(3, 1), Posting(1, 1),
+                    Posting(7, 2), Posting(5, 6)]
+        for posting in postings:
+            plist.add_posting(posting)
+        self.assertEqual(plist._postings, sorted(postings))
+        self.assertEqual(PostingList.deserialize(plist.serialize()), plist)
+        self.assertEqual(len(PostingList.deserialize(
+            plist.serialize())), len(plist))
+
     def test_posting_list_serialization(self):
         plist = PostingList()
         postings = [Posting(4, 1), Posting(2, 1),

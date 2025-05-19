@@ -75,8 +75,8 @@ class TestInvertedIndex(unittest.TestCase):
         indexer._merge_partial_indexes()
         path = Path(self.ii_dir.name)
         self.assertTrue(path.exists())
-        self.assertTrue((path / 'index.txt').exists())
-        self.assertTrue((path / 'terms.txt').exists())
+        self.assertTrue((path / 'inverted_index.bin').exists())
+        self.assertTrue((path / 'terms_map.bin').exists())
         self.assertEqual(
             len(list(path.iterdir())), 2
         )

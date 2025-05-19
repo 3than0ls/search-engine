@@ -16,7 +16,10 @@ class Posting:
     # url: str = ""
 
     def __str__(self):
-        return f"<Posting with doc ID {self.doc_id}>"
+        return f"<Posting | {self.doc_id}, {self.term_frequency}>"
+
+    def __repr__(self):
+        return self.__str__()
 
     def serialize(self) -> bytes:
         """

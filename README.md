@@ -34,9 +34,6 @@ Exports `load_config`, which loads in config settings from config.toml
 
 Exports `index_log` and `engine_log`, which are used to log important information in respective .log files.
 
-#### merge.py
-
-Exports `merge`, which will eventually be implemented to polyphase merge the partial indexes.
 
 #### tokenize.py
 

@@ -8,6 +8,7 @@ from pathlib import Path
 import os
 import warnings
 from collections import Counter
+from index.merger import Merger
 import time
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
@@ -139,7 +140,8 @@ class Indexer:
         Should not be called before first constructing the partial indexes.
         """
         # self._index = merge(self._partial_index_dir, self._index_dir)
-        raise NotImplementedError
+        merger = Merger(self._partial_index_dir, self._index_dir)
+        merger.merge()
 
     def num_docs(self) -> int:
         return self._num_docs

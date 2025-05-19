@@ -1,5 +1,5 @@
 from index.posting import Posting, POSTING_SIZE
-from typing import Iterator
+from typing import Iterator, Union, overload, Any
 import struct
 
 
@@ -16,11 +16,29 @@ class PostingList:
     def __len__(self) -> int:
         return len(self._postings)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         return isinstance(other, PostingList) and self._postings == other._postings
 
     def __iter__(self) -> Iterator[Posting]:
         yield from self._postings
+
+    @overload
+    def __getitem__(self, value: int) -> Posting: ...
+
+    @overload
+    def __getitem__(self, value: slice) -> list[Posting]:  ...
+
+    def __getitem__(self, value: Union[int, slice]) -> Union[Posting, list[Posting]]:
+        if isinstance(value, int):
+            return self._postings[value]
+        elif isinstance(value, slice):
+            return self._postings[value.start:value.stop:value.step]
+
+    def __str__(self):
+        return f"<PostingList | {len(self._postings)} postings>"
+
+    def __repr__(self):
+        return self.__str__()
 
     def add_posting(self, posting: Posting) -> None:
         """       
