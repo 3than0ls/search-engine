@@ -38,6 +38,11 @@ class PartialIndex:
         self._index[term].add_posting(posting)
         self._num_postings += 1
 
+    def add_posting_list(self, term: Term, postings_list: PostingList) -> None:
+        """Convenience method for adding a posting list at once. Assumes it's unsorted."""
+        for posting in postings_list:
+            self.add_posting(term, posting)
+
     def serialize(self) -> bytes:
         """
         Don't bother touching it.

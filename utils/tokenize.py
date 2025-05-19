@@ -1,11 +1,13 @@
-from collections import Counter
+from collections import Counter, defaultdict
+from bs4 import BeautifulSoup
+from typing import Mapping
+from index import Posting, Term, PostingList
 
 
 def _tokenize(text: str) -> Counter[str]:
     """
     ADAPTED FROM ASSIGNMENT 1
     Returns a Counter object representing the count of all tokens.
-    Typically this text is extracted from a BeautifulSoup via get_text().
     """
     tokens = Counter()
 
@@ -29,13 +31,16 @@ def _tokenize(text: str) -> Counter[str]:
     return tokens
 
 
-def get_tokens(text: str) -> Counter[str]:
+def get_postings(doc_id: int, soup: BeautifulSoup) -> Mapping[Term, PostingList]:
     """
-    Returns a Counter object representing the count of all tokens.
-    Typically this text is extracted from a BeautifulSoup via get_text().
+    Returns a Mapping of Terms to PostingLists.
+    Must maintain this header for use.
+    TODO: Update it to utilize td-idf scores and pointers and whatnot.
     """
-    tokens = _tokenize(text)
-    words = Counter({
-        token: count for token, count in tokens.items()
-    })
-    return words
+    tokens = _tokenize(soup.get_text(separator=" ", strip=True))
+    out: defaultdict[Term, PostingList] = defaultdict(PostingList)
+
+    for token, count in tokens.items():
+        out[Term(token)].add_posting(Posting(doc_id, count))
+
+    return out

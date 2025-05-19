@@ -1,11 +1,12 @@
 from index.term import Term
 from index.partial_index import PartialIndex
-from index.posting import Posting
-from utils import get_tokens, index_log
+from index import Posting, PostingList, Term
+from utils import get_postings, index_log
 from bs4 import BeautifulSoup
 import json
 from pathlib import Path
 from collections import Counter
+from typing import Mapping
 import time
 
 
@@ -43,19 +44,15 @@ class PartialIndexBuilder:
 
         return content, url, encoding
 
-    def _process_document(self, doc_path: Path) -> Counter[str]:
+    def _process_document(self, doc_path: Path) -> Mapping[Term, PostingList]:
         """Literally just a tokenizer wrapper, but also increases a _num_docs counter."""
         content, url, _ = self._load_document(doc_path)
         soup = BeautifulSoup(content, 'html.parser')
-        tokens = get_tokens(soup.get_text(separator=" ", strip=True))
-
-        # could use our own custom hashing of URL, but I'll pass
-        # doc_id = doc_path.stem
-        # index_log.info(
-        #     f"Processed [{doc_id}]({url}), and updating the index with {len(tokens)} postings.")
+        # utilize the document number as the doc_id
+        postings = get_postings(self._num_docs, soup)
 
         self._num_docs += 1
-        return tokens
+        return postings
 
     def _dump_current_partial_index(self) -> None:
         """Serialize current partial index to disk. Used in `self._create_new_partial_index()`"""
@@ -87,12 +84,10 @@ class PartialIndexBuilder:
     def build(self) -> None:
         """Constructs partial indexes from a directory of webpages."""
         for doc_path in self._webpages_dir.rglob('*.json'):
-            tokens = self._process_document(doc_path)
+            postings = self._process_document(doc_path)
             self._doc_id_map[self._num_docs] = doc_path
-            for token, count in tokens.items():
-                posting = Posting(doc_id=self._num_docs,
-                                  term_frequency=count)
-                self._partial_index.add_posting(Term(token), posting)
+            for term, postings_list in postings.items():
+                self._partial_index.add_posting_list(term, postings_list)
 
                 if self._partial_index.num_postings() >= self._BATCH_SIZE:
                     self._create_new_partial_index()
