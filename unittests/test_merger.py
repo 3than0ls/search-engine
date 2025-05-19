@@ -1,8 +1,7 @@
 import unittest
 
-from index.inverted_index import InvertedIndex
 from index.partial_index.partial_index_merging import PartialIndexMerger
-from index.partial_index.partial_index import PartialIndex, PartialIndexResource
+from index.partial_index.partial_index import PartialIndex
 from index.posting import Posting
 from index.posting_list import PostingList
 from index.term import Term

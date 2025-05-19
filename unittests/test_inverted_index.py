@@ -1,10 +1,8 @@
 import unittest
 import tempfile
 from pathlib import Path
-from index.inverted_index import InvertedIndex
-from index.posting import Posting
+from engine.inverted_index import InvertedIndex
 from utils import load_config
-import os
 
 
 class TestInvertedIndex(unittest.TestCase):

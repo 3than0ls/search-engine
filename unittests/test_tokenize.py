@@ -1,5 +1,4 @@
 import unittest
-from bs4 import BeautifulSoup
 from utils import get_tokens
 
 
