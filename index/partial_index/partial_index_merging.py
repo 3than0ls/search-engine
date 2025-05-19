@@ -1,10 +1,8 @@
 from pathlib import Path
 from collections import deque
-from index.posting import Posting
-from index.partial_index.partial_index import PartialIndex, PartialIndexResource
+from index.partial_index.partial_index import PartialIndexResource
 from index.posting_list import PostingList
-from index.term import Term
-from typing import Deque, Iterator, Generator, Tuple
+from typing import Deque, Iterator
 
 
 class PartialIndexMerger:
@@ -12,14 +10,7 @@ class PartialIndexMerger:
 
     def __init__(self, partial_index_dir: Path, index_dir: Path):
         self._partial_index_dir = partial_index_dir
-        if not partial_index_dir.is_dir() or not partial_index_dir.exists() or len(list(partial_index_dir.iterdir())) == 0:
-            raise ValueError(
-                f"Partial index directory cannot be empty.")
-
         self._index_dir = index_dir
-        if index_dir.is_dir() and index_dir.exists() and any(index_dir.iterdir()):
-            raise ValueError(
-                f"Inverted index directory must exist and must be empty.")
 
         self._runs: Deque[Path] = deque()
 

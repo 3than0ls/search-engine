@@ -1,14 +1,11 @@
 from index.term import Term
-from index.partial_index.partial_index import PartialIndex
+from index.partial_index import PartialIndex
 from index.posting import Posting
 from utils import get_tokens, index_log
-from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, MarkupResemblesLocatorWarning
+from bs4 import BeautifulSoup
 import json
 from pathlib import Path
-import os
-import warnings
 from collections import Counter
-from index.partial_index.partial_index_merging import PartialIndexMerger
 import time
 
 

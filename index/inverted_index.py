@@ -7,11 +7,7 @@ Each index term is associated with an inverted list
 - Lists are usually document-ordered (sorted by document number)
 """
 
-from collections import defaultdict
 from index.posting import Posting
-from index.posting_list import PostingList
-from utils.logger import index_log
-import os
 from pathlib import Path
 
 

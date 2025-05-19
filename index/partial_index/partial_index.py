@@ -3,8 +3,7 @@ from typing import DefaultDict, Iterator, Tuple, Optional
 from index.posting import Posting
 from index.posting_list import PostingList, POSTING_LIST_LENGTH_SIZE, POSTING_LIST_LENGTH_FORMAT
 from index.term import Term, TERM_LENGTH_SIZE, TERM_LENGTH_FORMAT
-from index.posting import POSTING_SIZE, POSTING_FORMAT
-from utils.logger import index_log
+from index.posting import POSTING_SIZE
 import bisect
 from pathlib import Path
 import struct

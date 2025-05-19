@@ -82,7 +82,6 @@ class TestMerger(unittest.TestCase):
             merger._merge_postings_lists(left, right)
 
     def test_merge_uneven_partial_indexes(self):
-        return
         # construct partial indexes and serialize
         pi_left = PartialIndex()
         pi_right = PartialIndex()
@@ -126,7 +125,6 @@ class TestMerger(unittest.TestCase):
             self.assertEqual(out_index, pi_all)
 
     def test_merge_partial_indexes(self):
-        return
         # construct partial indexes and serialize
         pi_left = PartialIndex()
         pi_right = PartialIndex()

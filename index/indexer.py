@@ -1,15 +1,8 @@
-from index.term import Term
-from index.partial_index.partial_index import PartialIndex
-from index.partial_index.partial_index_builder import PartialIndexBuilder
-from index.posting import Posting
-from utils import get_tokens, index_log
-from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning, MarkupResemblesLocatorWarning
-import json
+from index.partial_index import PartialIndexBuilder, PartialIndexMerger
+from utils import index_log
+from bs4 import XMLParsedAsHTMLWarning, MarkupResemblesLocatorWarning
 from pathlib import Path
-import os
 import warnings
-from collections import Counter
-from index.partial_index.partial_index_merging import PartialIndexMerger
 import time
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
