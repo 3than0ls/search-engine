@@ -7,8 +7,9 @@ Each index term is associated with an inverted list
 - Lists are usually document-ordered (sorted by document number)
 """
 
-from index.posting import Posting
 from pathlib import Path
+from index.partial_index.partial_index import PartialIndex
+from index import Term, PostingList
 
 
 class InvertedIndex:
@@ -21,14 +22,17 @@ class InvertedIndex:
 
     def __init__(self, index_dir: Path) -> None:
         self._index_dir = index_dir
+        self._index_fp = self._index_dir / "inverted_index.bin"
 
         # needs initialization
         self._num_terms = 0
         self._num_postings = 0
 
-    def get_postings(self, term: str) -> list[Posting]:
-        """Returns a list of postings for a given term. Works by opening the index file, seeking to the correct location, and reading the postings list, return the list of results."""
-        raise NotImplementedError
+    def _search_term(self, term: Term) -> PostingList:
+        """Returns a list of postings for a given term."""
+        with open(self._index_fp, "rb") as f:
+            index = PartialIndex.deserialize(f.read())._index
+            return index[term]
 
     def __str__(self):
         return f"<InvertedIndex stored at {self._index_dir} | {self._num_terms} terms, {self._num_postings} postings>"
