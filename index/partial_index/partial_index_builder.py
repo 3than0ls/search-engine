@@ -22,8 +22,8 @@ class PartialIndexBuilder:
         self._num_terms = 0
         self._start_time = 0
 
-        # mapping of document IDs (int) to document paths (Path)
-        self._doc_id_map: dict[int, Path] = {}
+        # mapping of document IDs (int) to document URLs, not paths
+        self._doc_id_map: dict[int, str] = {}
 
         # data for partial indexing- dangerous to modify during indexing, constant changes as construction goes on
         self._BATCH_SIZE = 2 ** 18
@@ -51,6 +51,8 @@ class PartialIndexBuilder:
         soup = BeautifulSoup(content, 'html.parser')
         # utilize the document number as the doc_id
         postings = get_postings(self._num_docs, soup)
+
+        self._doc_id_map[self._num_docs] = url
 
         self._num_docs += 1
         return postings
@@ -86,7 +88,6 @@ class PartialIndexBuilder:
         """Constructs partial indexes from a directory of webpages."""
         for doc_path in self._webpages_dir.rglob('*.json'):
             postings = self._process_document(doc_path)
-            self._doc_id_map[self._num_docs] = doc_path
             for term, postings_list in postings.items():
                 self._partial_index.add_posting_list(term, postings_list)
 
@@ -99,3 +100,8 @@ class PartialIndexBuilder:
         if self._partial_index.num_postings() > 0:
             self._dump_current_partial_index()
             self._partial_index_count += 1
+
+        doc_id_map_path = self._index_dir / "doc_id_map.json"
+        with open(doc_id_map_path, 'w') as f:
+            json.dump(self._doc_id_map, f, indent=4)
+        index_log.info(f"Saved document ID to URL mapping to {doc_id_map_path}")

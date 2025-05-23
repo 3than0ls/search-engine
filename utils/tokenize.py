@@ -4,13 +4,15 @@ from typing import Mapping
 from index.posting_list import PostingList
 from index.term import Term
 from index.posting import Posting
+import nltk
+from nltk.stem import PorterStemmer
 
 
-def _tokenize(text: str) -> Counter[str]:
+def tokenize(text: str) -> Counter[str]:
     """
-    ADAPTED FROM ASSIGNMENT 1
-    Returns a Counter object representing the count of all tokens.
+    Tokenizes input text, applies Porter stemming, and returns a Counter object.
     """
+    stemmer = PorterStemmer()
     tokens = Counter()
 
     buffer = ""
@@ -22,13 +24,17 @@ def _tokenize(text: str) -> Counter[str]:
             buffer += char.lower()
         else:
             if buffer:
-                tokens[buffer] += 1
+                # stem token
+                stemmed_token = stemmer.stem(buffer)
+                tokens[stemmed_token] += 1
                 buffer = ""
         cursor += 1
+            
 
-    # append anything leftover in the buffer
+    # append anything leftover in the buffer after stemming
     if buffer:
-        tokens[buffer] += 1
+        stemmed_token = stemmer.stem(buffer)
+        tokens[stemmed_token] += 1
 
     return tokens
 
@@ -39,7 +45,7 @@ def get_postings(doc_id: int, soup: BeautifulSoup) -> Mapping[Term, PostingList]
     Must maintain this header for use.
     TODO: Update it to utilize td-idf scores and pointers and whatnot.
     """
-    tokens = _tokenize(soup.get_text(separator=" ", strip=True))
+    tokens = tokenize(soup.get_text(separator=" ", strip=True))
     out: defaultdict[Term, PostingList] = defaultdict(PostingList)
 
     for token, count in tokens.items():
