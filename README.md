@@ -13,9 +13,9 @@ If on Linux, config variables are exported as environment variables. Run `./laun
 
 ## High level overview
 
-Program starts at `main.py`, where it creates an `Indexer` instance and runs `.construct()`, which constructs the inverted index. From then, the class `InvertedIndex` can be used to interface with the serialized disk data that is the inverted index.
+Program starts at `main.py`, where it creates an `Indexer` instance and runs `.construct()`, which constructs the inverted index. From then, the class `InvertedIndex` can be used to interface with the serialized disk data.
 
-The `Indexer` works by processing webpages to construct several `PartialIndex`es, which are map containers for `Term`s to `PostingList`s, which are themselves are containers for `Posting`s. The `PartialIndex`es are serialized and stored in a directory temporarily, then merged all together with polyphase merge to produce the file for the inverted index, along with auxiliary data files.
+The `Indexer` works by processing webpages to construct several `PartialIndex`es, which are map containers for stemmed `Term`s to `PostingList`s, which are themselves are containers for `Posting`s. The `PartialIndex`es are serialized and stored in a directory temporarily, then merged all together with polyphase merge to produce the file for the inverted index along with auxiliary data files (such as the document ID to URL mapping)
 
 The `InvertedIndex` is created as a interface for the inverted index disk data. nothing more. `InvertedIndex` will be used to query the data, but not modify it.
 
@@ -47,7 +47,15 @@ Everything from `PartialIndex` down has a `serialize()` method that serializes i
 
 ## Index Querying
 
-Has not yet been implemented. All querying will be done with the `InvertedIndex` object, which provides an interface for code to interact with the inverted index on disk.
+The search component is implemented in `search.py`. It loads the inverted index and the document ID to URL mapping. It supports boolean AND queries. Query terms are tokenized and stemmed before lookup.
+
+To run the search interface, execute:
+
+```bash
+python search.py
+```
+
+The program will prompt you for queries. Enter terms separated by spaces (e.g., `machine learning`). The top 5 retrieved URLs that contain all the stemmed query terms will be displayed.
 
 ## Directory `utils`
 
@@ -61,7 +69,7 @@ Exports `index_log` and `engine_log`, which are used to log important informatio
 
 ### tokenize.py
 
-Exports `get_postings`, which returns a mapping of terms to posting lists to be stored in the inverted index.
+Exports `get_postings`, which returns a mapping of stemmed terms to posting lists to be stored in the inverted index.
 
 ## Unit testing
 
