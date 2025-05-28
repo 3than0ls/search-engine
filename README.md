@@ -10,6 +10,26 @@ If on Windows, check `config.toml` and run `python main.py` or `python -m unitte
 
 If on Linux, config variables are exported as environment variables. Run `./launch.sh` or `./test.sh`. This assumes your virtual environment is stored in .venv of the CWD.
 
+## Running the Search Engine Web Interface
+
+To run the complete search engine with web interface:
+
+### 1. Start the Backend Server
+From the root directory, run:
+```bash
+python server.py
+```
+This will start the Flask server on `http://localhost:8080` that handles search API requests.
+
+### 2. Start the Frontend Client
+In another terminal, navigate to the client directory and start the development server:
+```bash
+cd client
+npm run dev
+```
+This will start the Next.js frontend on `http://localhost:3000`.
+
+The frontend provides a Google-like search interface that communicates with the Python backend to perform searches and display results.
 
 ## High level overview
 
