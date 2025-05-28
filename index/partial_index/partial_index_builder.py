@@ -39,7 +39,7 @@ class PartialIndexBuilder:
         assert 'content' in data, f"Content not specified for {doc_path}"
         content = data['content']
         assert 'url' in data, f"URL not specified for {doc_path}"
-        url = data['url']
+        url = data['url'].split('#')[0]  # project specs: ignore the fragment part, if you see it
         assert 'encoding' in data, f"Encoding not specified for {doc_path}"
         encoding = data['encoding']
 
