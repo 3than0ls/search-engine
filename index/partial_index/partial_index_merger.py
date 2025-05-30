@@ -116,7 +116,8 @@ class PartialIndexMerger:
             term_to_ii_position_fp = self._index_dir / "term_to_ii_position.json"
             with open(term_to_ii_position_fp, 'w') as f:
                 json.dump(term_to_ii_position, f, indent=4)
-            index_log.info(f"Saved term to inverted index binary data position mapping to {term_to_ii_position_fp}")
+            index_log.info(
+                f"Saved term to inverted index binary data position mapping to {term_to_ii_position_fp}")
 
     def merge(self) -> None:
         """
@@ -131,7 +132,8 @@ class PartialIndexMerger:
             two = self._runs.popleft()
             run_name = self._partial_index_dir / f"tmp_merge_run_{run}.bin"
             index_log.info(f"Merging {one} and {two} to {run_name}")
-            self._merge_partial_indexes(run_name, one, two)
+            self._merge_partial_indexes(
+                run_name, one, two, len(self._runs) == 2)
             self._runs.append(run_name)
             run += 1
 

@@ -39,7 +39,8 @@ class PartialIndexBuilder:
         assert 'content' in data, f"Content not specified for {doc_path}"
         content = data['content']
         assert 'url' in data, f"URL not specified for {doc_path}"
-        url = data['url'].split('#')[0]  # project specs: ignore the fragment part, if you see it
+        # project specs: ignore the fragment part, if you see it
+        url = data['url'].split('#')[0]
         assert 'encoding' in data, f"Encoding not specified for {doc_path}"
         encoding = data['encoding']
 
@@ -52,7 +53,8 @@ class PartialIndexBuilder:
         # utilize the document number as the doc_id
         postings = get_postings(self._num_docs, soup)
 
-        self._doc_id_map[self._num_docs] = url
+        if self._num_docs not in self._doc_id_map and url not in self._doc_id_map.values():
+            self._doc_id_map[self._num_docs] = url
 
         self._num_docs += 1
         return postings

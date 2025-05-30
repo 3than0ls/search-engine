@@ -4,28 +4,31 @@ from engine.inverted_index import InvertedIndex
 from utils.config import load_config
 import os
 
+
 def main():
-  load_config()
-  index_dir = Path(os.environ.get('INDEX_DIR', '.\index'))
+    load_config()
+    index_dir = Path(os.environ.get('INDEX_DIR', './inverted_index'))
 
-  try:
-    inverted_index = InvertedIndex(index_dir)
-  except FileNotFoundError:
-    print(f"Error: Inverted index file not found at {index_dir}. Please run the indexer first.")
-    sys.exit(1)
-    
-  while True:
-    query = input("\nEnter query: ")
-    if query.lower() == 'quit':
-      break
+    try:
+        inverted_index = InvertedIndex(index_dir)
+    except FileNotFoundError:
+        print(
+            f"Error: Inverted index file not found at {index_dir}. Please run the indexer first.")
+        sys.exit(1)
 
-    results = inverted_index.retrieve(query)
+    while True:
+        query = input("\nEnter query: ")
+        if query.lower() == 'quit':
+            break
 
-    if results:
-      for i, url in enumerate(results):
-        print(f"{i+1}. {url}")
-    else:
-      print("\nNo results found.")
+        results = inverted_index.ranked_retrieve(query)
+
+        if results:
+            for i, url in enumerate(results):
+                print(f"{i+1}. {url}")
+        else:
+            print("\nNo results found.")
+
 
 if __name__ == "__main__":
-  main() 
+    main()
