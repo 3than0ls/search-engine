@@ -101,7 +101,7 @@ class PartialIndexBuilder:
             self._dump_current_partial_index()
             self._partial_index_count += 1
 
-        doc_id_map_path = self._index_dir / "doc_id_map.json"
-        with open(doc_id_map_path, 'w') as f:
+        doc_id_map_fp = self._index_dir / "doc_id_map.json"
+        with open(doc_id_map_fp, 'w') as f:
             json.dump(self._doc_id_map, f, indent=4)
-        index_log.info(f"Saved document ID to URL mapping to {doc_id_map_path}")
+        index_log.info(f"Saved document ID to URL mapping to {doc_id_map_fp}")

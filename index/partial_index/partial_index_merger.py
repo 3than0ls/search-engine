@@ -2,8 +2,10 @@ from pathlib import Path
 from collections import deque
 from index.partial_index.partial_index import PartialIndexResource
 from index.posting_list import PostingList
+from index.term import Term
 from typing import Deque, Iterator
 from utils import index_log
+import json
 
 
 class PartialIndexMerger:
@@ -12,6 +14,7 @@ class PartialIndexMerger:
     def __init__(self, partial_index_dir: Path, index_dir: Path) -> None:
         self._partial_index_dir = partial_index_dir
         self._index_dir = index_dir
+        self._term_to_ii_position_fp = self._index_dir / "term_to_ii_position.json"
 
         self._runs: Deque[Path] = deque()
 
@@ -99,10 +102,21 @@ class PartialIndexMerger:
         for term, postings_list in leftover:
             yield term.serialize() + postings_list.serialize()
 
-    def _merge_partial_indexes(self, output_path: Path, left_path: Path, right_path: Path) -> None:
+    def _merge_partial_indexes(self, output_path: Path, left_path: Path, right_path: Path, _final_merge=False) -> None:
+        # only is used in the final merge; is a term to pointer in the inverted index file mapping, so in InvertedIndex, .seek() can be used
+        term_to_ii_position = {}
         with PartialIndexResource(left_path) as left, PartialIndexResource(right_path) as right, open(output_path, "wb") as out:
             for line in self._merge_partial_index_resources(left, right):
+                if _final_merge:
+                    term = Term.deserialize(line).term
+                    term_to_ii_position[term] = out.tell()
                 out.write(line)
+
+        if _final_merge:
+            term_to_ii_position_fp = self._index_dir / "term_to_ii_position.json"
+            with open(term_to_ii_position_fp, 'w') as f:
+                json.dump(term_to_ii_position, f, indent=4)
+            index_log.info(f"Saved term to inverted index binary data position mapping to {term_to_ii_position_fp}")
 
     def merge(self) -> None:
         """
