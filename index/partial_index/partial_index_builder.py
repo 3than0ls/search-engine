@@ -79,7 +79,7 @@ class PartialIndexBuilder:
         for term_str, score in weighted_term_freq.items():
             term = Term(term_str)
             postings.setdefault(term, PostingList())
-            postings[term].add(Posting(self._num_docs, int(score)))
+            postings[term].add(Posting(self._num_docs, score))
         
         # utilize the number of documents as the doc_id
         self._doc_id_map[self._num_docs] = url
