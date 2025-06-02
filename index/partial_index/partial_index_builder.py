@@ -57,6 +57,30 @@ class PartialIndexBuilder:
         soup = BeautifulSoup(content, 'html.parser')
         postings = get_postings(self._num_docs, soup)
 
+        TAG_WEIGHTS = {
+            'title': 3.0,
+            'h1': 2.5,
+            'h2': 2.0,
+            'h3': 1.5,
+            'b': 1.2,
+            'strong': 1.2,
+            'p': 1.0,
+            'body': 1.0
+        }
+        weighted_term_freq = defaultdict(float) 
+
+        for tag, weight in TAG_WEIGHTS.items():
+            for element in soup.find_all(tag):
+                text = element.get_text(separator=" ", strip=True)
+                for token in tokenize(text):
+                    weighted_term_freq[token] += weight
+
+        postings: dict[Term, PostingList] = {}
+        for term_str, score in weighted_term_freq.items():
+            term = Term(term_str)
+            postings.setdefault(term, PostingList())
+            postings[term].add(Posting(self._num_docs, int(score)))
+        
         # utilize the number of documents as the doc_id
         self._doc_id_map[self._num_docs] = url
         self._num_docs += 1
