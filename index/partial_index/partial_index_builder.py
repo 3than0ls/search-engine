@@ -5,6 +5,8 @@ from index.posting_list import PostingList
 from index.posting import Posting
 from utils import get_postings, index_log
 from bs4 import BeautifulSoup
+from collections import defaultdict, Counter
+from utils.tokenize import tokenize 
 import json
 from pathlib import Path
 from typing import Mapping
