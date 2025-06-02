@@ -14,7 +14,6 @@ class PartialIndexMerger:
     def __init__(self, partial_index_dir: Path, index_dir: Path) -> None:
         self._partial_index_dir = partial_index_dir
         self._index_dir = index_dir
-        self._term_to_ii_position_fp = self._index_dir / "term_to_ii_position.json"
 
         self._runs: Deque[Path] = deque()
 
@@ -128,12 +127,13 @@ class PartialIndexMerger:
 
         run = 0
         while len(self._runs) > 1:
+            final_merge = len(self._runs) == 2
             one = self._runs.popleft()
             two = self._runs.popleft()
             run_name = self._partial_index_dir / f"tmp_merge_run_{run}.bin"
             index_log.info(f"Merging {one} and {two} to {run_name}")
             self._merge_partial_indexes(
-                run_name, one, two, len(self._runs) == 2)
+                run_name, one, two, _final_merge=final_merge)
             self._runs.append(run_name)
             run += 1
 

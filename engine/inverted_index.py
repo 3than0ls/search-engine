@@ -13,6 +13,10 @@ from index import Term, PostingList, Posting
 from utils.tokenize import tokenize
 import math
 import json
+import struct
+from index.term import TERM_LENGTH_FORMAT, TERM_LENGTH_SIZE
+from index.posting_list import POSTING_LIST_LENGTH_FORMAT, POSTING_LIST_LENGTH_SIZE
+from index.posting import POSTING_SIZE
 
 
 class InvertedIndex:
@@ -25,27 +29,53 @@ class InvertedIndex:
 
     def __init__(self, index_dir: Path) -> None:
         self._index_dir = index_dir
+
+        if not index_dir.is_dir() or not index_dir.exists() or not any(index_dir.iterdir()):
+            raise ValueError(
+                f"Inverted index directory must be exist and be populated.")
+
         self._index_fp = self._index_dir / "inverted_index.bin"
         self._doc_id_map_fp = self._index_dir / "doc_id_map.json"
+        self._term_to_ii_position_fp = self._index_dir / "term_to_ii_position.json"
 
-        # needs initialization
-        # self._num_terms = 0
-        # self._num_postings = 0
-        self._num_docs = 0
-        self._doc_id_to_url: dict[int, str] = {}
-        if self._doc_id_map_fp.exists():
-            with open(self._doc_id_map_fp, 'r') as f:
-                # convert doc_ids back to int
-                self._doc_id_to_url = {
-                    int(k): v for k, v in json.load(f).items()}
+        with open(self._doc_id_map_fp, 'r') as f:
+            # convert doc_ids back to int
+            self._doc_id_to_url = {
+                int(doc_id): doc_url for doc_id, doc_url in json.load(f).items()}
             self._num_docs = len(self._doc_id_to_url)
+
+        with open(self._term_to_ii_position_fp, 'r') as f:
+            # convert term_to_ii_position to dict[str, int]
+            self._term_to_ii_position = {
+                term: pos for term, pos in json.load(f).items()}
+            self._num_terms = len(self._term_to_ii_position)
 
     def _search_term(self, term: Term) -> PostingList:
         """Returns a list of postings for a given term."""
         with open(self._index_fp, "rb") as f:
-            index = PartialIndex.deserialize(f.read())._index
-            # return empty PostingList if term isnt found
-            return index.get(term, PostingList())
+            position = self._term_to_ii_position.get(term.term)
+            if position is None:
+                # return empty PostingList if term isn't found in term to inverted index mapping
+                return PostingList()
+            f.seek(position)
+
+            # super shit design; I designed deserialization in PostingList and Post for partial index creation and merging
+            # that was designed to read a variable length of bytes and produce the object from it
+            # did not design it for a buffered reader. and if we were to convert the buffered reader into a bytes we'd have to load the entire thing
+            # instead, we have to basically reimplement deserialization, but instead of using a fixed bytes, we use the buffered reader
+            # I hate this this sucks
+            term_length = struct.unpack(
+                TERM_LENGTH_FORMAT, f.read(TERM_LENGTH_SIZE))[0]
+            term_data = f.read(term_length)
+            str_term = term_data.decode("utf-8")
+            assert str_term == term.term, "Term mismatch"
+
+            byte_buffer = f.read(POSTING_LIST_LENGTH_SIZE)
+            posting_list_length = struct.unpack(
+                POSTING_LIST_LENGTH_FORMAT, byte_buffer)[0]
+            byte_buffer += f.read(posting_list_length * POSTING_SIZE)
+            posting_list = PostingList.deserialize(byte_buffer)
+            return posting_list
 
     def _compute_tf_idf(self, term: Term, posting: Posting, term_posting_list: PostingList) -> float:
         """
@@ -100,7 +130,6 @@ class InvertedIndex:
 
         # sort results by score in descending order
         results.sort(key=lambda x: x[1], reverse=True)
-        print(results[:5])
 
         return [self._doc_id_to_url.get(result[0]) for result in results[:5]]
 

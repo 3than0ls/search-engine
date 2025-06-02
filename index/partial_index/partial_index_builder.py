@@ -49,14 +49,16 @@ class PartialIndexBuilder:
     def _process_document(self, doc_path: Path) -> Mapping[Term, PostingList]:
         """Literally just a tokenizer wrapper, but also increases a _num_docs counter."""
         content, url, _ = self._load_document(doc_path)
+        if url in self._doc_id_map.values():
+            return {}
+
         soup = BeautifulSoup(content, 'html.parser')
-        # utilize the document number as the doc_id
         postings = get_postings(self._num_docs, soup)
 
-        if self._num_docs not in self._doc_id_map and url not in self._doc_id_map.values():
-            self._doc_id_map[self._num_docs] = url
-
+        # utilize the number of documents as the doc_id
+        self._doc_id_map[self._num_docs] = url
         self._num_docs += 1
+
         return postings
 
     def _dump_current_partial_index(self) -> None:

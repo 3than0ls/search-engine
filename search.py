@@ -3,6 +3,7 @@ from pathlib import Path
 from engine.inverted_index import InvertedIndex
 from utils.config import load_config
 import os
+import time
 
 
 def main():
@@ -21,13 +22,16 @@ def main():
         if query.lower() == 'quit':
             break
 
+        start = time.time()
         results = inverted_index.ranked_retrieve(query)
+        end = time.time()
 
         if results:
             for i, url in enumerate(results):
                 print(f"{i+1}. {url}")
         else:
             print("\nNo results found.")
+        print(f"\nQuery executed in {end - start:.4f} seconds.")
 
 
 if __name__ == "__main__":
