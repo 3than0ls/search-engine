@@ -50,6 +50,9 @@ class InvertedIndex:
                 term: pos for term, pos in json.load(f).items()}
             self._num_terms = len(self._term_to_ii_position)
 
+        print("Number of documents in index:", self._num_docs)
+        print("Number of terms in index:", self._num_terms)
+
     def _search_term(self, term: Term) -> PostingList:
         """Returns a list of postings for a given term."""
         with open(self._index_fp, "rb") as f:
@@ -83,17 +86,31 @@ class InvertedIndex:
         """
         tf = 1 + math.log10(posting.term_frequency)
         # length of the term's posting list is the document frequency of that term. Add one to it in case the length is zero to avoid division by zero.
-        idf = math.log10(self._num_docs / (1 + len(term_posting_list)))
+        idf = math.log10(self._num_docs / len(term_posting_list))
         return tf * idf
 
     def _compute_score(self, term_postings: dict[Term, PostingList], posting: Posting) -> float:
         """
+        Term postings are a dictionary of all terms in the query and their corresponding posting lists.
         Future optimization: only compute scores for postings that are in ALL term posting lists:
         Essentially do a boolean retrieval first, then compute scores for the remaining postings.
+
+        Additionally, implements the soft conjunction heuristic. If the query has multiple terms, but several are not found in the document, don't include it.
+        The threshold for "several" is set to 3/4ths of the number of terms in the query.
         """
+
+        query_len = len(term_postings)
+        num_terms = 0
         score = 0
         for term, posting_list in term_postings.items():
+            if len(posting_list) == 0:
+                continue
             score += self._compute_tf_idf(term, posting, posting_list)
+            num_terms += 1
+
+        if num_terms <= query_len * 0.75:
+            return 0.0
+
         return score
 
     def _retrieve(self, query: str) -> dict[Term, PostingList]:
@@ -130,6 +147,7 @@ class InvertedIndex:
 
         # sort results by score in descending order
         results.sort(key=lambda x: x[1], reverse=True)
+        # print(results[:5])
 
         return [self._doc_id_to_url.get(result[0]) for result in results[:5]]
 

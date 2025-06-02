@@ -29,7 +29,6 @@ def tokenize(text: str) -> Counter[str]:
                 tokens[stemmed_token] += 1
                 buffer = ""
         cursor += 1
-            
 
     # append anything leftover in the buffer after stemming
     if buffer:
