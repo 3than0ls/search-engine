@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import psycopg2
 import sys
 from pathlib import Path
 import os
@@ -25,7 +24,7 @@ except FileNotFoundError:
 def search():
     query = request.args.get('query', default='', type=str)
     try:
-        results = inverted_index.retrieve(query)
+        results = inverted_index.ranked_retrieve(query)
         return jsonify({
             'query': query,
             'results': results,
