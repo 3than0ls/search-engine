@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 load_config()
-index_dir = Path(os.environ.get('INDEX_DIR', '.\index'))
+index_dir = Path(os.environ.get('INDEX_DIR', './index'))
 
 try:
     inverted_index = InvertedIndex(index_dir)
