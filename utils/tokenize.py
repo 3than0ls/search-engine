@@ -65,7 +65,7 @@ def get_postings(doc_id: int, soup: BeautifulSoup) -> Mapping[Term, PostingList]
     for tag in soup.find_all(_TAGS):
         tokens = tokenize(tag.get_text(separator=" ", strip=True))
         for token, count in tokens.items():
-            token_tf_map[token] += count * _TAG_WEIGHTS[tag]
+            token_tf_map[token] += count * _TAG_WEIGHTS[tag.name]
 
     out: defaultdict[Term, PostingList] = defaultdict(PostingList)
     for token, tf in token_tf_map.items():
