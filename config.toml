@@ -1,6 +1,6 @@
 # These are all loaded into the environment (os.environ), stored as strings
 [INDEX]
 # ./DEV/ or ./ANALYST/
-WEBPAGES_DIR='./ANALYST/'
+WEBPAGES_DIR='./DEV/'
 PARTIAL_INDEX_DIR='./partial_indexes/'
 INDEX_DIR='./inverted_index'

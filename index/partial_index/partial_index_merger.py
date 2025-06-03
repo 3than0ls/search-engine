@@ -125,6 +125,8 @@ class PartialIndexMerger:
         for p in self._partial_index_dir.iterdir():
             self._runs.append(p)
 
+        assert len(self._runs) > 0
+
         run = 0
         while len(self._runs) > 1:
             final_merge = len(self._runs) == 2

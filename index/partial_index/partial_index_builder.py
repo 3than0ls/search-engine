@@ -2,15 +2,24 @@ from index.term import Term
 from index.partial_index import PartialIndex
 from index.term import Term
 from index.posting_list import PostingList
-from index.posting import Posting
-from utils import get_postings, index_log
+from utils import get_postings, index_log, get_anchor_word_postings
 from bs4 import BeautifulSoup
-from collections import defaultdict, Counter
-from utils.tokenize import tokenize 
 import json
 from pathlib import Path
 from typing import Mapping
 import time
+import re
+
+# regex patterns used in validation, ripped from assignment 2
+FILE_EXT_PATTERN = re.compile(
+    r".*\.(css|js|bmp|gif|jpe?g|ico"
+    + r"|png|tiff?|mid|mp2|mp3|mp4"
+    + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
+    + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names|ppsx|odc|git|db|war|img|apk|bib|ff"
+    + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
+    + r"|epub|dll|cnf|tgz|sha1"
+    + r"|thmx|mso|arff|rtf|jar|csv"
+    + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$")
 
 
 class PartialIndexBuilder:
@@ -54,33 +63,15 @@ class PartialIndexBuilder:
         if url in self._doc_id_map.values():
             return {}
 
+        if FILE_EXT_PATTERN.match(url):
+            return {}
+
         soup = BeautifulSoup(content, 'html.parser')
         postings = get_postings(self._num_docs, soup)
+        anchor_postings = get_anchor_word_postings(self._doc_id_map, soup)
+        anchor_postings = {term: posting_list for term,
+                           posting_list in anchor_postings.items() if len(posting_list) > 0}
 
-        TAG_WEIGHTS = {
-            'title': 3.0,
-            'h1': 2.5,
-            'h2': 2.0,
-            'h3': 1.5,
-            'b': 1.2,
-            'strong': 1.2,
-            'p': 1.0,
-            'body': 1.0
-        }
-        weighted_term_freq = defaultdict(float) 
-
-        for tag, weight in TAG_WEIGHTS.items():
-            for element in soup.find_all(tag):
-                text = element.get_text(separator=" ", strip=True)
-                for token in tokenize(text):
-                    weighted_term_freq[token] += weight
-
-        postings: dict[Term, PostingList] = {}
-        for term_str, score in weighted_term_freq.items():
-            term = Term(term_str)
-            postings.setdefault(term, PostingList())
-            postings[term].add(Posting(self._num_docs, score))
-        
         # utilize the number of documents as the doc_id
         self._doc_id_map[self._num_docs] = url
         self._num_docs += 1

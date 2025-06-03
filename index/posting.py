@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import struct
 
 
-POSTING_FORMAT = "<If"
+POSTING_FORMAT = "<II"
 POSTING_SIZE = struct.calcsize(POSTING_FORMAT)
 
 
@@ -10,7 +10,7 @@ POSTING_SIZE = struct.calcsize(POSTING_FORMAT)
 class Posting:
     """A singular posting for a posting list in an inverted index. Posting is dumb and doesn't actually know what term it's for."""
     doc_id: int
-    term_frequency: float
+    term_frequency: int
     # tfidf_score: float = 1
     # url: str = ""
 
