@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface SearchResult {
   count: number;
@@ -9,37 +9,39 @@ interface SearchResult {
 }
 
 function Index() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [luckyIndex, setLuckyIndex] = useState(0);
 
   const luckyQueries = [
-    'cristina lopes',
-    'machine learning', 
-    'ACM',
-    'master of software engineering'
+    "cristina lopes",
+    "machine learning",
+    "ACM",
+    "master of software engineering",
   ];
 
   const search = async () => {
     if (!query.trim()) return;
-    
+
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/search?query=${encodeURIComponent(query)}`);
+      const response = await fetch(
+        `http://localhost:8080/api/search?query=${encodeURIComponent(query)}`
+      );
       const data = await response.json();
       setSearchResults(data);
       setHasSearched(true);
     } catch (error) {
-      console.error('Search failed:', error);
+      console.error("Search failed:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       search();
     }
   };
@@ -56,19 +58,22 @@ function Index() {
     try {
       const urlObj = new URL(url);
       const path = urlObj.pathname;
-      
-      if (path && path !== '/') {
-        const pathSegments = path.split('/').filter(Boolean);
+
+      if (path && path !== "/") {
+        const pathSegments = path.split("/").filter(Boolean);
         const lastSegment = pathSegments[pathSegments.length - 1];
-        
+
         if (lastSegment) {
           return lastSegment
-            .split('-')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join(' ');
+            .split("-")
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
+            .join(" ");
         }
       }
-      
+
       return urlObj.hostname;
     } catch {
       return url;
@@ -78,10 +83,12 @@ function Index() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className={`${hasSearched ? 'border-b border-gray-200' : ''}`}>
-        <div className={`max-w-6xl mx-auto px-4 ${hasSearched ? 'py-4' : 'pt-32'}`}>
+      <div className={`${hasSearched ? "border-b border-gray-200" : ""}`}>
+        <div
+          className={`max-w-6xl mx-auto px-4 ${hasSearched ? "py-4" : "pt-32"}`}
+        >
           {/* Logo/Title */}
-          <div className={`text-center ${hasSearched ? 'hidden' : 'mb-8'}`}>
+          <div className={`text-center ${hasSearched ? "hidden" : "mb-8"}`}>
             <h1 className="text-8xl font-semibold text-gray-700 mb-8">
               <span className="text-blue-500">O</span>
               <span className="text-red-500">o</span>
@@ -93,13 +100,17 @@ function Index() {
           </div>
 
           {/* Search Bar */}
-          <div className={`flex ${hasSearched ? 'items-center' : 'justify-center'} ${hasSearched ? '' : 'mb-8'}`}>
+          <div
+            className={`flex ${
+              hasSearched ? "items-center" : "justify-center"
+            } ${hasSearched ? "" : "mb-8"}`}
+          >
             {hasSearched && (
               <button
                 onClick={() => {
                   setHasSearched(false);
                   setSearchResults(null);
-                  setQuery('');
+                  setQuery("");
                 }}
                 className="text-5xl font-semibold text-blue-500 hover:text-blue-600 transition-colors duration-200 mr-6 absolute left-6"
               >
@@ -109,12 +120,22 @@ function Index() {
             <div className="relative w-full max-w-3xl">
               <div className="flex items-center border border-gray-300 rounded-full hover:shadow-md focus-within:shadow-md transition-shadow duration-200">
                 <div className="pl-4 pr-2">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
                 </div>
                 <input
-                  className="flex-1 py-3 px-2 text-lg outline-none"
+                  className="flex-1 py-3 px-2 text-lg outline-none text-black"
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -124,16 +145,26 @@ function Index() {
                 />
                 {query && (
                   <button
-                    onClick={() => setQuery('')}
+                    onClick={() => setQuery("")}
                     className="p-2 hover:bg-gray-100 rounded-full mr-2"
                   >
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 )}
               </div>
-              
+
               {!hasSearched && (
                 <div className="flex justify-center mt-8 space-x-4">
                   <button
@@ -141,7 +172,7 @@ function Index() {
                     onClick={search}
                     disabled={loading}
                   >
-                    {loading ? 'Searching...' : 'Search'}
+                    {loading ? "Searching..." : "Search"}
                   </button>
                   <button
                     className="bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 px-6 py-2 rounded text-sm"
@@ -155,7 +186,7 @@ function Index() {
                 </div>
               )}
             </div>
-            
+
             {hasSearched && (
               <button
                 className="ml-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-4 rounded-lg text-sm font-medium font-semibold"
@@ -181,7 +212,8 @@ function Index() {
             <>
               {/* Results count */}
               <div className="text-sm text-gray-600 mb-6">
-                About {searchResults.count.toLocaleString()} results for "{searchResults.query}"
+                About {searchResults.count.toLocaleString()} results for "
+                {searchResults.query}"
               </div>
 
               {/* Results list */}
@@ -191,19 +223,21 @@ function Index() {
                     <div className="group">
                       {/* URL breadcrumb */}
                       <div className="text-sm text-green-700 mb-1">
-                        {extractDomain(url)} › {url.length > 60 ? url.substring(0, 60) + '...' : url}
+                        {extractDomain(url)} ›{" "}
+                        {url.length > 60 ? url.substring(0, 60) + "..." : url}
                       </div>
-                      
+
                       {/* Title */}
                       <h3 className="text-xl text-blue-600 hover:underline cursor-pointer mb-1">
                         <a href={url} target="_blank" rel="noopener noreferrer">
                           {formatTitle(url)}
                         </a>
                       </h3>
-                      
+
                       {/* Description */}
                       <p className="text-sm text-gray-600 leading-relaxed">
-                        Relevant content found for your search query. Click to explore more information.
+                        Relevant content found for your search query. Click to
+                        explore more information.
                       </p>
                     </div>
                   </div>
@@ -212,7 +246,9 @@ function Index() {
             </>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-600">No results found. Try a different search term.</p>
+              <p className="text-gray-600">
+                No results found. Try a different search term.
+              </p>
             </div>
           )}
         </div>
