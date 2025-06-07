@@ -1,6 +1,22 @@
 # Search Engine
 
-See `TODO.md` for things that mut still be done.
+## Project Information
+
+Indexing starts in `index.py`, where the indexer builds several partial indexes, then merges them into a single inverted index.
+
+Building partial indexes: To build a partial index, a document is loaded then processed. To process a document, it is tokenized, then a mapping of postings is created for the document, then added to the partial index. After a certain size threshold, the partial index is serialized to binary and stored on disk. See `partial_index_builder.py`.
+
+Merging partial indexes: To merge the partial indexes, a polyphase merge algorithms is used, merging two partial indexes at a time. Partial indexes maintain sorted posting lists, making it easy to merge lists. After the partial indexes are merged, the next run is added to the queue and polyphase merge continues until only one partial index remains (the entire inverted index). See `partial_index_merger.py`.
+
+Document scoring: We score documents solely using tf-idf. Each posting element stores the document ID and the term frequency, and the tf-idf score is computed during query time.
+
+Query optimziation: To optimize queries, we take 2 approaches, a speed optimization and a ranking optimization. For speed, we utilize `seek()` in the inverted index file to find the exact location of the posting list for a term. For ranking, we utilize a soft conjunction heuristic. If a document is missing several terms in a query, it's score is decreased.
+
+Important words: We treat headers and bolded words as more important than regular text, and increase their weight (by simply artificially increasing the term frequency in the posting).
+
+Extra credit: We created a web GUI and and index anchor words for taget pages.
+
+Fun fact! Our inverted index uses a custom binary serializations, allowing it to have a size of 76M. To compare, the DEV index is 2.8G.
 
 ## Getting started
 
@@ -33,7 +49,7 @@ The frontend provides a Google-like search interface that communicates with the 
 
 ## High level overview
 
-Program starts at `main.py`, where it creates an `Indexer` instance and runs `.construct()`, which constructs the inverted index. From then, the class `InvertedIndex` can be used to interface with the serialized disk data.
+Program starts at `index.py`, where it creates an `Indexer` instance and runs `.construct()`, which constructs the inverted index. From then, the class `InvertedIndex` can be used to interface with the serialized disk data.
 
 The `Indexer` works by processing webpages to construct several `PartialIndex`es, which are map containers for stemmed `Term`s to `PostingList`s, which are themselves are containers for `Posting`s. The `PartialIndex`es are serialized and stored in a directory temporarily, then merged all together with polyphase merge to produce the file for the inverted index along with auxiliary data files (such as the document ID to URL mapping)
 
